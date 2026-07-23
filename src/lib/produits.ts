@@ -153,6 +153,13 @@ export interface Produit {
   marge_potentielle: number | null;
   date_vente: string | null;
   statut: Statut;
+  statut_modifie_manuellement: boolean;
+  statut_origine: "automatique" | "manuel" | "import";
+  statut_calcule_le: string | null;
+  nettoyage: EtatTravaux;
+  restauration: EtatTravaux;
+  actions_requises: ActionRequise[];
+  titre_commercial: string | null;
   prochaine_action: string | null;
   blocage: string | null;
   niveau_effort: number | null;
@@ -170,6 +177,57 @@ export interface Produit {
   doublon_valide: boolean;
   created_at: string;
 }
+
+export const ETATS_TRAVAUX = ["a_verifier", "non_necessaire", "necessaire", "en_cours", "termine"] as const;
+export type EtatTravaux = (typeof ETATS_TRAVAUX)[number];
+export const ETAT_TRAVAUX_LABEL: Record<EtatTravaux, string> = {
+  a_verifier: "À vérifier",
+  non_necessaire: "Non nécessaire",
+  necessaire: "Nécessaire",
+  en_cours: "En cours",
+  termine: "Terminé",
+};
+
+export type ActionRequise =
+  | "identification_a_completer"
+  | "prix_a_expertiser"
+  | "prix_incoherent"
+  | "nettoyage_a_verifier"
+  | "a_nettoyer"
+  | "restauration_a_verifier"
+  | "a_restaurer"
+  | "etat_a_verifier"
+  | "photos_manquantes"
+  | "description_manquante"
+  | "dimensions_manquantes";
+
+export const ACTION_REQUISE_LABEL: Record<ActionRequise, string> = {
+  identification_a_completer: "Identification à compléter",
+  prix_a_expertiser: "Prix à expertiser",
+  prix_incoherent: "Prix incohérent",
+  nettoyage_a_verifier: "Nettoyage à vérifier",
+  a_nettoyer: "À nettoyer",
+  restauration_a_verifier: "Restauration à vérifier",
+  a_restaurer: "À restaurer",
+  etat_a_verifier: "État à vérifier",
+  photos_manquantes: "Photos manquantes",
+  description_manquante: "Description manquante",
+  dimensions_manquantes: "Dimensions manquantes",
+};
+
+export const ACTION_REQUISE_COULEUR: Record<ActionRequise, string> = {
+  identification_a_completer: "bg-warning/15 text-warning border-warning/30",
+  prix_a_expertiser: "bg-warning/15 text-warning border-warning/30",
+  prix_incoherent: "bg-destructive/15 text-destructive border-destructive/30",
+  nettoyage_a_verifier: "bg-secondary text-secondary-foreground border-border",
+  a_nettoyer: "bg-secondary text-secondary-foreground border-border",
+  restauration_a_verifier: "bg-secondary text-secondary-foreground border-border",
+  a_restaurer: "bg-secondary text-secondary-foreground border-border",
+  etat_a_verifier: "bg-secondary text-secondary-foreground border-border",
+  photos_manquantes: "bg-accent/15 text-accent-foreground border-accent/30",
+  description_manquante: "bg-accent/15 text-accent-foreground border-accent/30",
+  dimensions_manquantes: "bg-accent/15 text-accent-foreground border-accent/30",
+};
 
 export function margeReelle(p: Pick<Produit, "statut" | "prix_vente_reel" | "cout_total">): number | null {
   if (p.statut !== "VENDU" || p.prix_vente_reel == null) return null;
