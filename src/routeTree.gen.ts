@@ -22,6 +22,7 @@ import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedDebloquerRouteImport } from './routes/_authenticated/debloquer'
 import { Route as AuthenticatedCorbeilleRouteImport } from './routes/_authenticated/corbeille'
 import { Route as AuthenticatedAujourdhuiRouteImport } from './routes/_authenticated/aujourdhui'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -88,6 +89,11 @@ const AuthenticatedAujourdhuiRoute = AuthenticatedAujourdhuiRouteImport.update({
   path: '/aujourdhui',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
   id: '/produit/$id',
   path: '/produit/$id',
@@ -97,6 +103,7 @@ const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
   '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
   '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/aujourdhui': typeof AuthenticatedAujourdhuiRoute
   '/_authenticated/corbeille': typeof AuthenticatedCorbeilleRoute
   '/_authenticated/debloquer': typeof AuthenticatedDebloquerRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/aujourdhui'
     | '/corbeille'
     | '/debloquer'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/admin'
     | '/aujourdhui'
     | '/corbeille'
     | '/debloquer'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/aujourdhui'
     | '/_authenticated/corbeille'
     | '/_authenticated/debloquer'
@@ -289,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAujourdhuiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produit/$id': {
       id: '/_authenticated/produit/$id'
       path: '/produit/$id'
@@ -300,6 +319,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAujourdhuiRoute: typeof AuthenticatedAujourdhuiRoute
   AuthenticatedCorbeilleRoute: typeof AuthenticatedCorbeilleRoute
   AuthenticatedDebloquerRoute: typeof AuthenticatedDebloquerRoute
@@ -314,6 +334,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAujourdhuiRoute: AuthenticatedAujourdhuiRoute,
   AuthenticatedCorbeilleRoute: AuthenticatedCorbeilleRoute,
   AuthenticatedDebloquerRoute: AuthenticatedDebloquerRoute,

@@ -3,6 +3,7 @@ import { Home, Package, Kanban, Coins, MoreHorizontal } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRole } from "@/hooks/useRole";
 
 const NAV = [
   { to: "/aujourdhui", label: "Aujourd'hui", icon: Home },
@@ -11,13 +12,14 @@ const NAV = [
   { to: "/finances", label: "Finances", icon: Coins },
 ] as const;
 
-const MORE = [
+const MORE: ReadonlyArray<{ to: string; label: string; adminOnly?: boolean }> = [
   { to: "/taches", label: "Tâches" },
   { to: "/debloquer", label: "À débloquer" },
   { to: "/ventes", label: "Ventes" },
   { to: "/qualite", label: "Qualité des données" },
   { to: "/historique", label: "Historique" },
   { to: "/corbeille", label: "Corbeille" },
+  { to: "/admin", label: "Administration", adminOnly: true },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -25,6 +27,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [openMore, setOpenMore] = useState(false);
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { isAdmin } = useRole();
+  const items = MORE.filter((m) => !m.adminOnly || isAdmin);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -44,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto max-w-md space-y-1">
-              {MORE.map((it) => (
+              {items.map((it) => (
                 <Link
                   key={it.to} to={it.to}
                   onClick={() => setOpenMore(false)}

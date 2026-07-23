@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_log: {
+        Row: {
+          acteur_email: string | null
+          acteur_id: string | null
+          action: string
+          cible_email: string | null
+          cible_id: string | null
+          cible_type: string | null
+          created_at: string
+          details: Json | null
+          id: string
+        }
+        Insert: {
+          acteur_email?: string | null
+          acteur_id?: string | null
+          action: string
+          cible_email?: string | null
+          cible_id?: string | null
+          cible_type?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Update: {
+          acteur_email?: string | null
+          acteur_id?: string | null
+          action?: string
+          cible_email?: string | null
+          cible_id?: string | null
+          cible_type?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          accepte_par: string | null
+          created_at: string
+          email: string
+          expire_at: string
+          id: string
+          invite_par: string | null
+          message: string | null
+          permissions: Database["public"]["Enums"]["role_permission"][]
+          role_propose: Database["public"]["Enums"]["app_role"]
+          statut: Database["public"]["Enums"]["invitation_statut"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepte_par?: string | null
+          created_at?: string
+          email: string
+          expire_at?: string
+          id?: string
+          invite_par?: string | null
+          message?: string | null
+          permissions?: Database["public"]["Enums"]["role_permission"][]
+          role_propose: Database["public"]["Enums"]["app_role"]
+          statut?: Database["public"]["Enums"]["invitation_statut"]
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          accepte_par?: string | null
+          created_at?: string
+          email?: string
+          expire_at?: string
+          id?: string
+          invite_par?: string | null
+          message?: string | null
+          permissions?: Database["public"]["Enums"]["role_permission"][]
+          role_propose?: Database["public"]["Enums"]["app_role"]
+          statut?: Database["public"]["Enums"]["invitation_statut"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       produit_historique: {
         Row: {
           acteur_email: string | null
@@ -428,6 +509,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_status: {
+        Row: {
+          motif: string | null
+          suspendu: boolean
+          suspendu_at: string | null
+          suspendu_par: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          motif?: string | null
+          suspendu?: boolean
+          suspendu_at?: string | null
+          suspendu_par?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          motif?: string | null
+          suspendu?: boolean
+          suspendu_at?: string | null
+          suspendu_par?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       produits_public: {
@@ -480,8 +588,8 @@ export type Database = {
           prix_public_ttc?: number | null
           sous_categorie?: string | null
           titre_commercial?: string | null
-          tva_regime?: never
-          tva_taux?: never
+          tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux?: number | null
           updated_at?: string | null
           visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
         }
@@ -507,8 +615,8 @@ export type Database = {
           prix_public_ttc?: number | null
           sous_categorie?: string | null
           titre_commercial?: string | null
-          tva_regime?: never
-          tva_taux?: never
+          tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux?: number | null
           updated_at?: string | null
           visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
         }
@@ -577,6 +685,7 @@ export type Database = {
         | "necessaire"
         | "non_necessaire"
         | "terminee"
+      invitation_statut: "en_attente" | "acceptee" | "expiree" | "revoquee"
       motif_archivage:
         | "vendu_anterieurement"
         | "retire_vente"
@@ -795,6 +904,7 @@ export const Constants = {
         "non_necessaire",
         "terminee",
       ],
+      invitation_statut: ["en_attente", "acceptee", "expiree", "revoquee"],
       motif_archivage: [
         "vendu_anterieurement",
         "retire_vente",
