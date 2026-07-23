@@ -73,6 +73,7 @@ export type Database = {
           description: string | null
           designer_ou_marque: string | null
           dimensions: string | null
+          disponibilite: Database["public"]["Enums"]["produit_disponibilite"]
           documents_authenticite: Json
           donnees_douteuses: Json | null
           doublon_groupe: string | null
@@ -100,10 +101,14 @@ export type Database = {
           poids: string | null
           prix_achat: number | null
           prix_minimum_accepte: number | null
+          prix_minimum_interne: number | null
+          prix_pro_ht: number | null
+          prix_public_ttc: number | null
           prix_vente_cible: number | null
           prix_vente_reel: number | null
           prochaine_action: string | null
           puissance: string | null
+          remise_pro_pct: number | null
           restauration: Database["public"]["Enums"]["etat_restauration"]
           revetement: string | null
           sensibilite: string | null
@@ -115,11 +120,16 @@ export type Database = {
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean
           statut_origine: Database["public"]["Enums"]["origine_statut"]
+          tarif_pro_valide_jusqu: string | null
           titre_commercial: string | null
           trashed_at: string | null
           trashed_by: string | null
+          tva_regime: Database["public"]["Enums"]["tva_regime"]
+          tva_taux: number
           type_objet: string | null
           updated_at: string
+          validation_statut: Database["public"]["Enums"]["validation_statut"]
+          visibilite: Database["public"]["Enums"]["produit_visibilite"]
           woodcase: string | null
         }
         Insert: {
@@ -144,6 +154,7 @@ export type Database = {
           description?: string | null
           designer_ou_marque?: string | null
           dimensions?: string | null
+          disponibilite?: Database["public"]["Enums"]["produit_disponibilite"]
           documents_authenticite?: Json
           donnees_douteuses?: Json | null
           doublon_groupe?: string | null
@@ -171,10 +182,14 @@ export type Database = {
           poids?: string | null
           prix_achat?: number | null
           prix_minimum_accepte?: number | null
+          prix_minimum_interne?: number | null
+          prix_pro_ht?: number | null
+          prix_public_ttc?: number | null
           prix_vente_cible?: number | null
           prix_vente_reel?: number | null
           prochaine_action?: string | null
           puissance?: string | null
+          remise_pro_pct?: number | null
           restauration?: Database["public"]["Enums"]["etat_restauration"]
           revetement?: string | null
           sensibilite?: string | null
@@ -186,11 +201,16 @@ export type Database = {
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean
           statut_origine?: Database["public"]["Enums"]["origine_statut"]
+          tarif_pro_valide_jusqu?: string | null
           titre_commercial?: string | null
           trashed_at?: string | null
           trashed_by?: string | null
+          tva_regime?: Database["public"]["Enums"]["tva_regime"]
+          tva_taux?: number
           type_objet?: string | null
           updated_at?: string
+          validation_statut?: Database["public"]["Enums"]["validation_statut"]
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"]
           woodcase?: string | null
         }
         Update: {
@@ -215,6 +235,7 @@ export type Database = {
           description?: string | null
           designer_ou_marque?: string | null
           dimensions?: string | null
+          disponibilite?: Database["public"]["Enums"]["produit_disponibilite"]
           documents_authenticite?: Json
           donnees_douteuses?: Json | null
           doublon_groupe?: string | null
@@ -242,10 +263,14 @@ export type Database = {
           poids?: string | null
           prix_achat?: number | null
           prix_minimum_accepte?: number | null
+          prix_minimum_interne?: number | null
+          prix_pro_ht?: number | null
+          prix_public_ttc?: number | null
           prix_vente_cible?: number | null
           prix_vente_reel?: number | null
           prochaine_action?: string | null
           puissance?: string | null
+          remise_pro_pct?: number | null
           restauration?: Database["public"]["Enums"]["etat_restauration"]
           revetement?: string | null
           sensibilite?: string | null
@@ -257,11 +282,16 @@ export type Database = {
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean
           statut_origine?: Database["public"]["Enums"]["origine_statut"]
+          tarif_pro_valide_jusqu?: string | null
           titre_commercial?: string | null
           trashed_at?: string | null
           trashed_by?: string | null
+          tva_regime?: Database["public"]["Enums"]["tva_regime"]
+          tva_taux?: number
           type_objet?: string | null
           updated_at?: string
+          validation_statut?: Database["public"]["Enums"]["validation_statut"]
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"]
           woodcase?: string | null
         }
         Relationships: []
@@ -344,7 +374,38 @@ export type Database = {
             referencedRelation: "produits"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "taches_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      user_permissions: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          permission: Database["public"]["Enums"]["role_permission"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          permission: Database["public"]["Enums"]["role_permission"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          permission?: Database["public"]["Enums"]["role_permission"]
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -369,7 +430,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      produits_public: {
+        Row: {
+          annee: string | null
+          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          couleur: string | null
+          created_at: string | null
+          description: string | null
+          designer_ou_marque: string | null
+          dimensions: string | null
+          disponibilite:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          editeur_ou_label: string | null
+          etat: string | null
+          id: string | null
+          identifiant: string | null
+          materiaux: string | null
+          modele: string | null
+          photos: Json | null
+          prix_pro_ht: number | null
+          prix_public_ttc: number | null
+          sous_categorie: string | null
+          titre_commercial: string | null
+          tva_regime: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux: number | null
+          updated_at: string | null
+          visibilite: Database["public"]["Enums"]["produit_visibilite"] | null
+        }
+        Insert: {
+          annee?: string | null
+          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          couleur?: string | null
+          created_at?: string | null
+          description?: string | null
+          designer_ou_marque?: string | null
+          dimensions?: string | null
+          disponibilite?:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          editeur_ou_label?: string | null
+          etat?: string | null
+          id?: string | null
+          identifiant?: string | null
+          materiaux?: string | null
+          modele?: string | null
+          photos?: Json | null
+          prix_pro_ht?: never
+          prix_public_ttc?: number | null
+          sous_categorie?: string | null
+          titre_commercial?: string | null
+          tva_regime?: never
+          tva_taux?: never
+          updated_at?: string | null
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
+        }
+        Update: {
+          annee?: string | null
+          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          couleur?: string | null
+          created_at?: string | null
+          description?: string | null
+          designer_ou_marque?: string | null
+          dimensions?: string | null
+          disponibilite?:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          editeur_ou_label?: string | null
+          etat?: string | null
+          id?: string | null
+          identifiant?: string | null
+          materiaux?: string | null
+          modele?: string | null
+          photos?: Json | null
+          prix_pro_ht?: never
+          prix_public_ttc?: number | null
+          sous_categorie?: string | null
+          titre_commercial?: string | null
+          tva_regime?: never
+          tva_taux?: never
+          updated_at?: string | null
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculer_actions_requises: {
@@ -380,11 +524,22 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: Database["public"]["Enums"]["statut_produit"]
       }
+      has_permission: {
+        Args: {
+          _perm: Database["public"]["Enums"]["role_permission"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_role_name: {
+        Args: { _role_name: string; _user_id: string }
         Returns: boolean
       }
       marge_reelle: {
@@ -401,7 +556,12 @@ export type Database = {
         | "corbeille"
         | "restaure_corbeille"
         | "supprime"
-      app_role: "admin" | "user"
+      app_role:
+        | "admin"
+        | "user"
+        | "collaborateur"
+        | "invite_particulier"
+        | "invite_pro"
       categorie_produit:
         | "enceintes"
         | "chaises"
@@ -426,6 +586,22 @@ export type Database = {
         | "erreur_saisie"
         | "autre"
       origine_statut: "automatique" | "manuel"
+      produit_disponibilite:
+        | "DISPONIBLE"
+        | "RESERVE"
+        | "VENDU"
+        | "NON_DISPONIBLE"
+        | "SUR_DEMANDE"
+      produit_visibilite: "PRIVE" | "PARTICULIER" | "PRO" | "TOUS" | "MASQUE"
+      role_permission:
+        | "voir_prix_achat"
+        | "voir_marges"
+        | "modifier_prix"
+        | "voir_factures_achat"
+        | "creer_produit"
+        | "modifier_produit"
+        | "archiver_produit"
+        | "exporter"
       statut_produit:
         | "A_IDENTIFIER"
         | "A_EXPERTISER"
@@ -440,6 +616,7 @@ export type Database = {
         | "VENDU"
         | "ARCHIVE"
       statut_tache: "a_faire" | "en_cours" | "fait" | "annule"
+      tva_regime: "marge" | "normal"
       type_action:
         | "nettoyage"
         | "restauration"
@@ -457,6 +634,7 @@ export type Database = {
         | "tester"
         | "emballer"
         | "relancer"
+      validation_statut: "brouillon" | "valide"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -593,7 +771,13 @@ export const Constants = {
         "restaure_corbeille",
         "supprime",
       ],
-      app_role: ["admin", "user"],
+      app_role: [
+        "admin",
+        "user",
+        "collaborateur",
+        "invite_particulier",
+        "invite_pro",
+      ],
       categorie_produit: [
         "enceintes",
         "chaises",
@@ -621,6 +805,24 @@ export const Constants = {
         "autre",
       ],
       origine_statut: ["automatique", "manuel"],
+      produit_disponibilite: [
+        "DISPONIBLE",
+        "RESERVE",
+        "VENDU",
+        "NON_DISPONIBLE",
+        "SUR_DEMANDE",
+      ],
+      produit_visibilite: ["PRIVE", "PARTICULIER", "PRO", "TOUS", "MASQUE"],
+      role_permission: [
+        "voir_prix_achat",
+        "voir_marges",
+        "modifier_prix",
+        "voir_factures_achat",
+        "creer_produit",
+        "modifier_produit",
+        "archiver_produit",
+        "exporter",
+      ],
       statut_produit: [
         "A_IDENTIFIER",
         "A_EXPERTISER",
@@ -636,6 +838,7 @@ export const Constants = {
         "ARCHIVE",
       ],
       statut_tache: ["a_faire", "en_cours", "fait", "annule"],
+      tva_regime: ["marge", "normal"],
       type_action: [
         "nettoyage",
         "restauration",
@@ -654,6 +857,7 @@ export const Constants = {
         "emballer",
         "relancer",
       ],
+      validation_statut: ["brouillon", "valide"],
     },
   },
 } as const
