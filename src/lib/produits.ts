@@ -1,6 +1,7 @@
 export const STATUTS = [
   "A_IDENTIFIER",
   "A_EXPERTISER",
+  "ETAT_A_VERIFIER",
   "A_NETTOYER",
   "A_RESTAURER",
   "A_PHOTOGRAPHIER",
@@ -16,6 +17,7 @@ export type Statut = (typeof STATUTS)[number];
 export const STATUT_LABEL: Record<Statut, string> = {
   A_IDENTIFIER: "À identifier",
   A_EXPERTISER: "À expertiser",
+  ETAT_A_VERIFIER: "État à vérifier",
   A_NETTOYER: "À nettoyer",
   A_RESTAURER: "À restaurer",
   A_PHOTOGRAPHIER: "À photographier",
@@ -25,6 +27,22 @@ export const STATUT_LABEL: Record<Statut, string> = {
   RESERVE: "Réservé",
   VENDU: "Vendu",
   ARCHIVE: "Archivé",
+};
+
+// Couleur sémantique par statut (tokens du design system)
+export const STATUT_COULEUR: Record<Statut, string> = {
+  A_IDENTIFIER: "bg-warning/15 text-warning border-warning/40",
+  A_EXPERTISER: "bg-warning/15 text-warning border-warning/40",
+  ETAT_A_VERIFIER: "bg-secondary text-secondary-foreground border-border",
+  A_NETTOYER: "bg-secondary text-secondary-foreground border-border",
+  A_RESTAURER: "bg-secondary text-secondary-foreground border-border",
+  A_PHOTOGRAPHIER: "bg-accent/15 text-accent-foreground border-accent/40",
+  A_REDIGER: "bg-accent/15 text-accent-foreground border-accent/40",
+  PRET_A_PUBLIER: "bg-primary/15 text-primary border-primary/40",
+  EN_LIGNE: "bg-primary text-primary-foreground border-primary",
+  RESERVE: "bg-accent text-accent-foreground border-accent",
+  VENDU: "bg-muted text-muted-foreground border-border",
+  ARCHIVE: "bg-muted text-muted-foreground border-border",
 };
 
 export const CATEGORIES = [
