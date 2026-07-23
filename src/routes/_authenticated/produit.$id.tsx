@@ -169,8 +169,11 @@ function Fiche() {
       <div className="container-app py-4 space-y-4">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-brass">
-              {p.identifiant} · {CAT_LABEL[p.categorie]}{p.sous_categorie ? ` · ${p.sous_categorie}` : ""}
+            <p className="text-sm font-mono font-medium text-brass tracking-widest">
+              {p.identifiant}
+            </p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
+              {CAT_LABEL[p.categorie]}{p.sous_categorie ? ` · ${p.sous_categorie}` : ""}
             </p>
             <h1 className="font-serif text-3xl leading-tight mt-1">{p.designer_ou_marque ?? "—"}</h1>
             <p className="text-sm text-muted-foreground">
