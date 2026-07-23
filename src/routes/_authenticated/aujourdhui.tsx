@@ -26,7 +26,7 @@ function Aujourdhui() {
   const produitsQ = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").order("created_at", { ascending: true });
+      const { data, error } = await supabase.from("produits").select("*").is("archived_at", null).is("trashed_at", null).order("created_at", { ascending: true });
       if (error) throw error;
       return (data ?? []) as unknown as Produit[];
     },
