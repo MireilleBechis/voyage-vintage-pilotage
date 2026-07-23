@@ -123,6 +123,14 @@ function Stock() {
             className="w-full pl-9 pr-3 py-2.5 rounded-md border bg-card text-sm"
           />
         </div>
+        <div className="flex gap-1 rounded-md border bg-card p-0.5 text-xs">
+          {(["actifs","archives","corbeille"] as Audience[]).map((a) => (
+            <button key={a} onClick={() => setAudience(a)}
+              className={`px-2 py-1 rounded ${audience === a ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+              {a === "actifs" ? "Actifs" : a === "archives" ? "Archivés" : "Corbeille"}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-2 overflow-x-auto">
           <select value={cat} onChange={(e) => setCat(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
             <option value="">Toutes catégories</option>
