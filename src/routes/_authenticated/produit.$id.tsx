@@ -7,7 +7,12 @@ import {
   STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
   ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
+  VISIBILITES, VISIBILITE_LABEL, type Visibilite,
+  DISPONIBILITES, DISPONIBILITE_LABEL, type Disponibilite,
+  TVA_REGIMES, TVA_REGIME_LABEL, type TvaRegime,
+  calculerPrixProTtc,
 } from "@/lib/produits";
+import { useRole } from "@/hooks/useRole";
 import { eur, dateFr, anciennete } from "@/lib/format";
 import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -32,6 +37,7 @@ function Fiche() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const role = useRole();
 
   const retour = useCallback(() => {
     // Préserve la recherche/filtres/tri/scroll de la liste précédente.
@@ -301,6 +307,46 @@ function Fiche() {
             value={p.prix_vente_reel} onSave={(v) => updateMut.mutate({ prix_vente_reel: v as number })} display={eur(p.prix_vente_reel)} />
         </Grid>
 
+        {role.isInterne && (
+          <>
+            <SectionTitle>Visibilité & tarifs invités</SectionTitle>
+            <Grid>
+              <SelectField
+                label="Visibilité"
+                value={p.visibilite}
+                options={VISIBILITES.map((v) => ({ value: v, label: VISIBILITE_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ visibilite: v as Visibilite })}
+              />
+              <SelectField
+                label="Disponibilité"
+                value={p.disponibilite}
+                options={DISPONIBILITES.map((v) => ({ value: v, label: DISPONIBILITE_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ disponibilite: v as Disponibilite })}
+              />
+              <TextField label="Prix public TTC (€)" editing={editing} type="number"
+                value={p.prix_public_ttc} onSave={(v) => updateMut.mutate({ prix_public_ttc: v as number })} display={eur(p.prix_public_ttc)} />
+              <TextField label="Prix pro HT (€)" editing={editing} type="number"
+                value={p.prix_pro_ht} onSave={(v) => updateMut.mutate({ prix_pro_ht: v as number })} display={eur(p.prix_pro_ht)} />
+              <SelectField
+                label="Régime TVA"
+                value={p.tva_regime}
+                options={TVA_REGIMES.map((v) => ({ value: v, label: TVA_REGIME_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ tva_regime: v as TvaRegime })}
+              />
+              <TextField label="Taux TVA (%)" editing={editing} type="number"
+                value={p.tva_taux} onSave={(v) => updateMut.mutate({ tva_taux: v as number })} display={p.tva_taux != null ? `${p.tva_taux} %` : "—"} />
+              <ReadOnly label="Prix pro TTC (calc.)" value={eur(calculerPrixProTtc(p.prix_pro_ht, p.tva_regime, p.tva_taux))} />
+              <TextField label="Prix minimum interne (€)" editing={editing} type="number"
+                value={p.prix_minimum_interne} onSave={(v) => updateMut.mutate({ prix_minimum_interne: v as number })} display={eur(p.prix_minimum_interne)} />
+            </Grid>
+            <p className="text-[11px] text-muted-foreground">
+              Le prix minimum interne n'est jamais visible par les invités. Le régime « marge bénéficiaire » (art. 297 A CGI) n'affiche pas la TVA à l'acheteur.
+            </p>
+          </>
+        )}
+
+
+
         <SectionTitle>Identification</SectionTitle>
         <Grid>
           <TextField label="Designer / marque" editing={editing} value={p.designer_ou_marque}
@@ -512,6 +558,26 @@ function EtatSelect({ label, value, onSave }: {
   );
 }
 
+
+function SelectField({ label, value, options, onSave }: {
+  label: string;
+  value: string;
+  options: Array<{ value: string; label: string }>;
+  onSave: (v: string) => void;
+}) {
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <select
+        value={value}
+        onChange={(e) => onSave(e.target.value)}
+        className="w-full mt-1 rounded-md border bg-card px-2 py-1.5 text-sm"
+      >
+        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+  );
+}
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
