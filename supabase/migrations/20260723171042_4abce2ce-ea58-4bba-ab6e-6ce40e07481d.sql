@@ -1,0 +1,1 @@
+ALTER FUNCTION public.marge_reelle(public.produits) SET search_path = public;
