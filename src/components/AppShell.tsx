@@ -12,6 +12,7 @@ const NAV = [
 ] as const;
 
 const MORE = [
+  { to: "/taches", label: "Tâches" },
   { to: "/debloquer", label: "À débloquer" },
   { to: "/ventes", label: "Ventes" },
   { to: "/qualite", label: "Qualité des données" },
