@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import { Trash2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import type { Produit } from "@/lib/produits";
@@ -28,13 +28,10 @@ function Corbeille() {
   const q = useQuery({
     queryKey: ["corbeille"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("produits_interne")
-        .select("*")
-        .not("trashed_at", "is", null)
-        .order("trashed_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !!p.trashed_at)
+        .sort((a, b) => (b.trashed_at ?? "").localeCompare(a.trashed_at ?? ""));
     },
   });
 

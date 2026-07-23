@@ -19,7 +19,10 @@ function Finances() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null);
+      const { listProduitsInterne } = await import("@/lib/produits-api");
+      const rows = await listProduitsInterne();
+      const data = rows.filter((p) => !p.archived_at && !p.trashed_at);
+      const error = null as null | { message: string };
       if (error) throw error;
       return (data ?? []) as unknown as Produit[];
     },

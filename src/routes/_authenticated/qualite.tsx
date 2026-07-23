@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne, updateProduit } from "@/lib/produits-api";
 import type { Produit } from "@/lib/produits";
 import { AlertTriangle, CheckCircle2, Copy as CopyIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -20,9 +20,8 @@ function Qualite() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null);
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all.filter((p) => !p.archived_at && !p.trashed_at);
     },
   });
   const list = q.data ?? [];
@@ -38,8 +37,7 @@ function Qualite() {
 
   const validerMut = useMutation({
     mutationFn: async ({ id, valide }: { id: string; valide: boolean }) => {
-      const { error } = await supabase.from("produits").update({ doublon_valide: valide }).eq("id", id);
-      if (error) throw error;
+      await updateProduit(id, { doublon_valide: valide });
     },
     onSuccess: () => {
       toast.success("Marqué comme vérifié.");

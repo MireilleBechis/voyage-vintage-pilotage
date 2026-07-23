@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne, updateProduit } from "@/lib/produits-api";
 import { calculerPriorites } from "@/lib/priorite";
 import { STATUT_LABEL, statutSuivant, type Produit } from "@/lib/produits";
 import { Link } from "@tanstack/react-router";
@@ -26,9 +26,10 @@ function Aujourdhui() {
   const produitsQ = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null).order("created_at", { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !p.archived_at && !p.trashed_at)
+        .sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
     },
   });
 
@@ -45,8 +46,7 @@ function Aujourdhui() {
     mutationFn: async (p: Produit) => {
       const next = statutSuivant(p.statut);
       if (!next) throw new Error("Aucune étape suivante.");
-      const { error } = await supabase.from("produits").update({ statut: next }).eq("id", p.id);
-      if (error) throw error;
+      await updateProduit(p.id, { statut: next });
       return next;
     },
     onSuccess: (next) => {

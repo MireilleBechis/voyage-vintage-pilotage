@@ -60,9 +60,16 @@ function Taches() {
   const produitsQ = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("id, identifiant, designer_ou_marque, modele").is("trashed_at", null);
-      if (error) throw error;
-      return (data ?? []) as unknown as Pick<Produit, "id" | "identifiant" | "designer_ou_marque" | "modele">[];
+      const { listProduitsInterne } = await import("@/lib/produits-api");
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !p.trashed_at)
+        .map((p) => ({
+          id: p.id,
+          identifiant: p.identifiant,
+          designer_ou_marque: p.designer_ou_marque,
+          modele: p.modele,
+        }));
     },
   });
 
