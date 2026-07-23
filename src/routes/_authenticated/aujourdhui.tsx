@@ -87,17 +87,30 @@ function Aujourdhui() {
     );
   }
 
+  const enStock = produits.filter((p) => !["VENDU", "ARCHIVE"].includes(p.statut));
+  const aDebloquer = enStock.filter((p) => (p.actions_requises?.length ?? 0) > 0).length;
+  const pretsAPublier = enStock.filter((p) => p.statut === "PRET_A_PUBLIER").length;
+  const enLigne = enStock.filter((p) => p.statut === "EN_LIGNE" || p.statut === "RESERVE").length;
+  const margePot = enStock.reduce((s, p) => s + Number(p.marge_potentielle ?? 0), 0);
+
   return (
     <div className="container-app py-6">
-      <header className="mb-6">
+      <header className="mb-5">
         <p className="text-xs uppercase tracking-[0.3em] text-brass">
           {today.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
         </p>
         <h1 className="font-serif text-4xl text-primary mt-1">Aujourd'hui</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          {priorites.length} priorité{priorites.length > 1 ? "s" : ""} · {produits.length} produits en stock
+          {priorites.length} priorité{priorites.length > 1 ? "s" : ""} · {enStock.length} produits en stock
         </p>
       </header>
+
+      <div className="grid grid-cols-4 gap-2 mb-6">
+        <MiniKPI label="À débloquer" value={aDebloquer} to="/debloquer" tone="warning" />
+        <MiniKPI label="Prêts" value={pretsAPublier} to="/stock" tone="primary" />
+        <MiniKPI label="En ligne" value={enLigne} to="/stock" />
+        <MiniKPI label="Marge pot." value={margePot > 0 ? `${Math.round(margePot / 1000)}k` : "—"} to="/finances" />
+      </div>
 
       {priorites.length === 0 ? (
         <div className="border rounded-xl bg-card p-6 text-center text-muted-foreground">
