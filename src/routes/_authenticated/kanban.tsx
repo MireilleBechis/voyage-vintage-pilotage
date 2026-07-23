@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import { STATUTS, STATUT_LABEL, type Produit } from "@/lib/produits";
 import { eur } from "@/lib/format";
 
@@ -18,9 +18,10 @@ function Kanban() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null).order("created_at");
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !p.archived_at && !p.trashed_at)
+        .sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""));
     },
   });
   const produits = q.data ?? [];

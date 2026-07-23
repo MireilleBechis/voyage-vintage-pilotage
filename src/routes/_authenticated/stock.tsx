@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import {
   CAT_LABEL,
   CATEGORIES,
@@ -62,17 +62,13 @@ function Stock() {
   const produitsQ = useQuery({
     queryKey: ["produits", audience],
     queryFn: async () => {
-      let query = supabase.from("produits_interne").select("*").order("identifiant");
-      if (audience === "actifs") {
-        query = query.is("archived_at", null).is("trashed_at", null);
-      } else if (audience === "archives") {
-        query = query.not("archived_at", "is", null).is("trashed_at", null);
-      } else {
-        query = query.not("trashed_at", "is", null);
-      }
-      const { data, error } = await query;
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      const filtered = all.filter((p) => {
+        if (audience === "actifs") return !p.archived_at && !p.trashed_at;
+        if (audience === "archives") return !!p.archived_at && !p.trashed_at;
+        return !!p.trashed_at;
+      });
+      return filtered.sort((a, b) => a.identifiant.localeCompare(b.identifiant));
     },
   });
 
