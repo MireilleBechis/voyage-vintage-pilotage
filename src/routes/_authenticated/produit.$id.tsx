@@ -7,7 +7,12 @@ import {
   STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
   ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
+  VISIBILITES, VISIBILITE_LABEL, type Visibilite,
+  DISPONIBILITES, DISPONIBILITE_LABEL, type Disponibilite,
+  TVA_REGIMES, TVA_REGIME_LABEL, type TvaRegime,
+  calculerPrixProTtc,
 } from "@/lib/produits";
+import { useRole } from "@/hooks/useRole";
 import { eur, dateFr, anciennete } from "@/lib/format";
 import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
