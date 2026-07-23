@@ -155,3 +155,20 @@ function Aujourdhui() {
     </div>
   );
 }
+
+function MiniKPI({
+  label, value, to, tone,
+}: { label: string; value: number | string; to: string; tone?: "warning" | "primary" }) {
+  const toneClass =
+    tone === "warning"
+      ? "text-warning"
+      : tone === "primary"
+        ? "text-primary"
+        : "text-foreground";
+  return (
+    <Link to={to} className="border rounded-lg bg-card p-2 text-center block">
+      <p className={`font-serif text-xl ${toneClass}`}>{value}</p>
+      <p className="text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">{label}</p>
+    </Link>
+  );
+}
