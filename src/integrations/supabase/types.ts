@@ -977,6 +977,12 @@ export type Database = {
         | "modifier_produit"
         | "archiver_produit"
         | "exporter"
+        | "voir_couts"
+        | "voir_prix_minimum"
+        | "modifier_prix_achat"
+        | "modifier_prix_public"
+        | "modifier_prix_pro"
+        | "modifier_prix_minimum"
       statut_produit:
         | "A_IDENTIFIER"
         | "A_EXPERTISER"
@@ -1198,6 +1204,12 @@ export const Constants = {
         "modifier_produit",
         "archiver_produit",
         "exporter",
+        "voir_couts",
+        "voir_prix_minimum",
+        "modifier_prix_achat",
+        "modifier_prix_public",
+        "modifier_prix_pro",
+        "modifier_prix_minimum",
       ],
       statut_produit: [
         "A_IDENTIFIER",
