@@ -181,6 +181,17 @@ export interface Produit {
   archive_motif: MotifArchivage | null;
   trashed_at: string | null;
   trashed_by: string | null;
+  // Étape 8 — visibilité + tarifs multi-niveaux
+  visibilite: Visibilite;
+  disponibilite: Disponibilite;
+  prix_public_ttc: number | null;
+  prix_pro_ht: number | null;
+  tva_regime: TvaRegime;
+  tva_taux: number | null;
+  prix_minimum_interne: number | null;
+  remise_pro_pct: number | null;
+  tarif_pro_valide_jusqu: string | null;
+  validation_statut: ValidationStatut;
 }
 
 export const MOTIFS_ARCHIVAGE = [
