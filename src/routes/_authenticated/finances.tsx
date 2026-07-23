@@ -102,7 +102,7 @@ function Row({ label, count, value, value2 }: { label: string; count: number; va
 }
 
 function sum(arr: Array<number | null | undefined>): number {
-  return arr.reduce((a, b) => a + Number(b ?? 0), 0);
+  return arr.reduce<number>((a, b) => a + Number(b ?? 0), 0);
 }
 function groupBy<T, K extends string>(arr: T[], keyFn: (t: T) => K): Record<K, T[]> {
   const out = {} as Record<K, T[]>;

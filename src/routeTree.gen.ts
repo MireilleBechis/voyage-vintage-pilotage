@@ -9,38 +9,173 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVentesRouteImport } from './routes/_authenticated/ventes'
+import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
+import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticated/qualite'
+import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
+import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticated/finances'
+import { Route as AuthenticatedDebloquerRouteImport } from './routes/_authenticated/debloquer'
+import { Route as AuthenticatedAujourdhuiRouteImport } from './routes/_authenticated/aujourdhui'
+import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVentesRoute = AuthenticatedVentesRouteImport.update({
+  id: '/ventes',
+  path: '/ventes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedQualiteRoute = AuthenticatedQualiteRouteImport.update({
+  id: '/qualite',
+  path: '/qualite',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
+  id: '/kanban',
+  path: '/kanban',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFinancesRoute = AuthenticatedFinancesRouteImport.update({
+  id: '/finances',
+  path: '/finances',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDebloquerRoute = AuthenticatedDebloquerRouteImport.update({
+  id: '/debloquer',
+  path: '/debloquer',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAujourdhuiRoute = AuthenticatedAujourdhuiRouteImport.update({
+  id: '/aujourdhui',
+  path: '/aujourdhui',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
+  id: '/produit/$id',
+  path: '/produit/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/debloquer': typeof AuthenticatedDebloquerRoute
+  '/finances': typeof AuthenticatedFinancesRoute
+  '/kanban': typeof AuthenticatedKanbanRoute
+  '/qualite': typeof AuthenticatedQualiteRoute
+  '/stock': typeof AuthenticatedStockRoute
+  '/ventes': typeof AuthenticatedVentesRoute
+  '/produit/$id': typeof AuthenticatedProduitIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/debloquer': typeof AuthenticatedDebloquerRoute
+  '/finances': typeof AuthenticatedFinancesRoute
+  '/kanban': typeof AuthenticatedKanbanRoute
+  '/qualite': typeof AuthenticatedQualiteRoute
+  '/stock': typeof AuthenticatedStockRoute
+  '/ventes': typeof AuthenticatedVentesRoute
+  '/produit/$id': typeof AuthenticatedProduitIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/_authenticated/debloquer': typeof AuthenticatedDebloquerRoute
+  '/_authenticated/finances': typeof AuthenticatedFinancesRoute
+  '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
+  '/_authenticated/qualite': typeof AuthenticatedQualiteRoute
+  '/_authenticated/stock': typeof AuthenticatedStockRoute
+  '/_authenticated/ventes': typeof AuthenticatedVentesRoute
+  '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/aujourdhui'
+    | '/debloquer'
+    | '/finances'
+    | '/kanban'
+    | '/qualite'
+    | '/stock'
+    | '/ventes'
+    | '/produit/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/aujourdhui'
+    | '/debloquer'
+    | '/finances'
+    | '/kanban'
+    | '/qualite'
+    | '/stock'
+    | '/ventes'
+    | '/produit/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/aujourdhui'
+    | '/_authenticated/debloquer'
+    | '/_authenticated/finances'
+    | '/_authenticated/kanban'
+    | '/_authenticated/qualite'
+    | '/_authenticated/stock'
+    | '/_authenticated/ventes'
+    | '/_authenticated/produit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +183,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ventes': {
+      id: '/_authenticated/ventes'
+      path: '/ventes'
+      fullPath: '/ventes'
+      preLoaderRoute: typeof AuthenticatedVentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/stock': {
+      id: '/_authenticated/stock'
+      path: '/stock'
+      fullPath: '/stock'
+      preLoaderRoute: typeof AuthenticatedStockRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/qualite': {
+      id: '/_authenticated/qualite'
+      path: '/qualite'
+      fullPath: '/qualite'
+      preLoaderRoute: typeof AuthenticatedQualiteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/kanban': {
+      id: '/_authenticated/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof AuthenticatedKanbanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finances': {
+      id: '/_authenticated/finances'
+      path: '/finances'
+      fullPath: '/finances'
+      preLoaderRoute: typeof AuthenticatedFinancesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/debloquer': {
+      id: '/_authenticated/debloquer'
+      path: '/debloquer'
+      fullPath: '/debloquer'
+      preLoaderRoute: typeof AuthenticatedDebloquerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/aujourdhui': {
+      id: '/_authenticated/aujourdhui'
+      path: '/aujourdhui'
+      fullPath: '/aujourdhui'
+      preLoaderRoute: typeof AuthenticatedAujourdhuiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/produit/$id': {
+      id: '/_authenticated/produit/$id'
+      path: '/produit/$id'
+      fullPath: '/produit/$id'
+      preLoaderRoute: typeof AuthenticatedProduitIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAujourdhuiRoute: typeof AuthenticatedAujourdhuiRoute
+  AuthenticatedDebloquerRoute: typeof AuthenticatedDebloquerRoute
+  AuthenticatedFinancesRoute: typeof AuthenticatedFinancesRoute
+  AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
+  AuthenticatedQualiteRoute: typeof AuthenticatedQualiteRoute
+  AuthenticatedStockRoute: typeof AuthenticatedStockRoute
+  AuthenticatedVentesRoute: typeof AuthenticatedVentesRoute
+  AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAujourdhuiRoute: AuthenticatedAujourdhuiRoute,
+  AuthenticatedDebloquerRoute: AuthenticatedDebloquerRoute,
+  AuthenticatedFinancesRoute: AuthenticatedFinancesRoute,
+  AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
+  AuthenticatedQualiteRoute: AuthenticatedQualiteRoute,
+  AuthenticatedStockRoute: AuthenticatedStockRoute,
+  AuthenticatedVentesRoute: AuthenticatedVentesRoute,
+  AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
