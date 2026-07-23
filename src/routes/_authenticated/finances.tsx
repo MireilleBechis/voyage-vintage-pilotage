@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import { CAT_LABEL, margeReelle, STATUT_COULEUR, STATUT_LABEL, type Produit, type Statut } from "@/lib/produits";
 import { eur } from "@/lib/format";
 import { differenceInDays, parseISO } from "date-fns";
@@ -19,12 +19,8 @@ function Finances() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { listProduitsInterne } = await import("@/lib/produits-api");
       const rows = await listProduitsInterne();
-      const data = rows.filter((p) => !p.archived_at && !p.trashed_at);
-      const error = null as null | { message: string };
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      return rows.filter((p) => !p.archived_at && !p.trashed_at) as Produit[];
     },
   });
   const list = q.data ?? [];
