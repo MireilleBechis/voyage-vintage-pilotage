@@ -12,13 +12,14 @@ const NAV = [
   { to: "/finances", label: "Finances", icon: Coins },
 ] as const;
 
-const MORE = [
+const MORE: ReadonlyArray<{ to: string; label: string; adminOnly?: boolean }> = [
   { to: "/taches", label: "Tâches" },
   { to: "/debloquer", label: "À débloquer" },
   { to: "/ventes", label: "Ventes" },
   { to: "/qualite", label: "Qualité des données" },
   { to: "/historique", label: "Historique" },
   { to: "/corbeille", label: "Corbeille" },
+  { to: "/admin", label: "Administration", adminOnly: true },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -26,6 +27,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [openMore, setOpenMore] = useState(false);
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { isAdmin } = useRole();
+  const items = MORE.filter((m) => !m.adminOnly || isAdmin);
 
   async function signOut() {
     await qc.cancelQueries();
