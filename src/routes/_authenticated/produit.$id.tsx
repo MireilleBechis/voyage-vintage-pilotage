@@ -2,9 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL } from "@/lib/produits";
+import {
+  STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
+  STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
+  ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
+} from "@/lib/produits";
 import { eur, dateFr, anciennete } from "@/lib/format";
-import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
