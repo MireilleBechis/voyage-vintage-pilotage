@@ -29,7 +29,7 @@ function Corbeille() {
     queryKey: ["corbeille"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("produits")
+        .from("produits_interne")
         .select("*")
         .not("trashed_at", "is", null)
         .order("trashed_at", { ascending: false });

@@ -26,7 +26,7 @@ function Ventes() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").is("trashed_at", null).order("updated_at", { ascending: false });
+      const { data, error } = await supabase.from("produits_interne").select("*").is("trashed_at", null).order("updated_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Produit[];
     },

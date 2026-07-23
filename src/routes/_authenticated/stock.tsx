@@ -62,7 +62,7 @@ function Stock() {
   const produitsQ = useQuery({
     queryKey: ["produits", audience],
     queryFn: async () => {
-      let query = supabase.from("produits").select("*").order("identifiant");
+      let query = supabase.from("produits_interne").select("*").order("identifiant");
       if (audience === "actifs") {
         query = query.is("archived_at", null).is("trashed_at", null);
       } else if (audience === "archives") {

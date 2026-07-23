@@ -49,7 +49,7 @@ function Fiche() {
   const q = useQuery({
     queryKey: ["produit", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase.from("produits_interne").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       return (data as unknown as Produit) ?? null;
     },
