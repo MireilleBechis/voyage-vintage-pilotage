@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVentesRouteImport } from './routes/_authenticated/ventes'
+import { Route as AuthenticatedTachesRouteImport } from './routes/_authenticated/taches'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticated/qualite'
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
@@ -38,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedVentesRoute = AuthenticatedVentesRouteImport.update({
   id: '/ventes',
   path: '/ventes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTachesRoute = AuthenticatedTachesRouteImport.update({
+  id: '/taches',
+  path: '/taches',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/kanban': typeof AuthenticatedKanbanRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/taches': typeof AuthenticatedTachesRoute
   '/ventes': typeof AuthenticatedVentesRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
 }
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/kanban': typeof AuthenticatedKanbanRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
+  '/taches': typeof AuthenticatedTachesRoute
   '/ventes': typeof AuthenticatedVentesRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
 }
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
   '/_authenticated/qualite': typeof AuthenticatedQualiteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
+  '/_authenticated/taches': typeof AuthenticatedTachesRoute
   '/_authenticated/ventes': typeof AuthenticatedVentesRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
 }
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/kanban'
     | '/qualite'
     | '/stock'
+    | '/taches'
     | '/ventes'
     | '/produit/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/kanban'
     | '/qualite'
     | '/stock'
+    | '/taches'
     | '/ventes'
     | '/produit/$id'
   id:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/kanban'
     | '/_authenticated/qualite'
     | '/_authenticated/stock'
+    | '/_authenticated/taches'
     | '/_authenticated/ventes'
     | '/_authenticated/produit/$id'
   fileRoutesById: FileRoutesById
@@ -188,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/ventes'
       fullPath: '/ventes'
       preLoaderRoute: typeof AuthenticatedVentesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/taches': {
+      id: '/_authenticated/taches'
+      path: '/taches'
+      fullPath: '/taches'
+      preLoaderRoute: typeof AuthenticatedTachesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/stock': {
@@ -249,6 +268,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
   AuthenticatedQualiteRoute: typeof AuthenticatedQualiteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
+  AuthenticatedTachesRoute: typeof AuthenticatedTachesRoute
   AuthenticatedVentesRoute: typeof AuthenticatedVentesRoute
   AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
 }
@@ -260,6 +280,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
   AuthenticatedQualiteRoute: AuthenticatedQualiteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
+  AuthenticatedTachesRoute: AuthenticatedTachesRoute,
   AuthenticatedVentesRoute: AuthenticatedVentesRoute,
   AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
 }
