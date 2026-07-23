@@ -19,6 +19,7 @@ import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
 import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticated/finances'
 import { Route as AuthenticatedDebloquerRouteImport } from './routes/_authenticated/debloquer'
+import { Route as AuthenticatedCorbeilleRouteImport } from './routes/_authenticated/corbeille'
 import { Route as AuthenticatedAujourdhuiRouteImport } from './routes/_authenticated/aujourdhui'
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 
@@ -71,6 +72,11 @@ const AuthenticatedDebloquerRoute = AuthenticatedDebloquerRouteImport.update({
   path: '/debloquer',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCorbeilleRoute = AuthenticatedCorbeilleRouteImport.update({
+  id: '/corbeille',
+  path: '/corbeille',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAujourdhuiRoute = AuthenticatedAujourdhuiRouteImport.update({
   id: '/aujourdhui',
   path: '/aujourdhui',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
   '/finances': typeof AuthenticatedFinancesRoute
   '/kanban': typeof AuthenticatedKanbanRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
   '/finances': typeof AuthenticatedFinancesRoute
   '/kanban': typeof AuthenticatedKanbanRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/aujourdhui': typeof AuthenticatedAujourdhuiRoute
+  '/_authenticated/corbeille': typeof AuthenticatedCorbeilleRoute
   '/_authenticated/debloquer': typeof AuthenticatedDebloquerRoute
   '/_authenticated/finances': typeof AuthenticatedFinancesRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/aujourdhui'
+    | '/corbeille'
     | '/debloquer'
     | '/finances'
     | '/kanban'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/aujourdhui'
+    | '/corbeille'
     | '/debloquer'
     | '/finances'
     | '/kanban'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/aujourdhui'
+    | '/_authenticated/corbeille'
     | '/_authenticated/debloquer'
     | '/_authenticated/finances'
     | '/_authenticated/kanban'
@@ -244,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDebloquerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/corbeille': {
+      id: '/_authenticated/corbeille'
+      path: '/corbeille'
+      fullPath: '/corbeille'
+      preLoaderRoute: typeof AuthenticatedCorbeilleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/aujourdhui': {
       id: '/_authenticated/aujourdhui'
       path: '/aujourdhui'
@@ -263,6 +282,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAujourdhuiRoute: typeof AuthenticatedAujourdhuiRoute
+  AuthenticatedCorbeilleRoute: typeof AuthenticatedCorbeilleRoute
   AuthenticatedDebloquerRoute: typeof AuthenticatedDebloquerRoute
   AuthenticatedFinancesRoute: typeof AuthenticatedFinancesRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
@@ -275,6 +295,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAujourdhuiRoute: AuthenticatedAujourdhuiRoute,
+  AuthenticatedCorbeilleRoute: AuthenticatedCorbeilleRoute,
   AuthenticatedDebloquerRoute: AuthenticatedDebloquerRoute,
   AuthenticatedFinancesRoute: AuthenticatedFinancesRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
