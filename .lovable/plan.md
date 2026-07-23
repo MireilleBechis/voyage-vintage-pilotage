@@ -1,91 +1,79 @@
+## Préalable — Corriger l'Étape 8 (migration unique)
 
-## Étape 7 — Archivage, corbeille et suppression
+1. **Vue `produits_public`** : ajouter `WHERE visibilite IN ('PARTICULIER','PRO','TOUS') AND disponibilite <> 'NON_DISPONIBLE' AND validation_statut = 'valide' AND archived_at IS NULL AND trashed_at IS NULL`. Filtrer aussi `visibilite = 'PARTICULIER'` seulement pour invité particulier, `'PRO'` seulement pour invité pro.
+2. **GRANTs** : `GRANT SELECT ON produits_public TO authenticated`.
+3. **Policies `produits`** : recréer toutes en `TO authenticated`, avec `WITH CHECK (owner_id = auth.uid())` sur INSERT/UPDATE. Supprimer les policies `{public}`.
+4. **Pas de SELECT direct sur `produits` pour invités** : leurs policies passent uniquement par la vue.
+5. Relancer `supabase--linter` et documenter chaque warning restant (fichier, règle, justification, mesure de mitigation).
 
-Trois niveaux distincts, avec parcours obligatoire Carte → menu ⋯ → Corbeille → Suppression définitive (admin uniquement).
+## Étape 9 — Page « Utilisateurs et accès »
 
-### 1. Base de données (migration unique)
+### Base de données
 
-Ajouts sur `produits` (non destructifs, aucune donnée existante modifiée) :
-- `archived_at` timestamptz, `archived_by` uuid, `archive_motif` text
-- `trashed_at` timestamptz, `trashed_by` uuid
-- Enum `motif_archivage` : `vendu_anterieurement | retire_vente | conservation_perso | donne | perdu_endommage | erreur_saisie | autre`
-- Index partiels sur `archived_at IS NULL AND trashed_at IS NULL` (stock actif rapide)
+Nouvelle migration :
 
-Nouvelles tables :
-- `user_roles` (id, user_id, role enum `app_role = admin | user`, unique(user_id, role)) + RLS + fonction `has_role(uuid, app_role)` SECURITY DEFINER. Utilisatrice actuelle promue `admin`.
-- `produit_historique` : id, produit_id, identifiant (copié pour survie), action enum (`cree | modifie | archive | restaure | corbeille | restaure_corbeille | supprime`), acteur uuid, acteur_email text, details jsonb, created_at.
+- **Enum `role_permission`** étendu : ajouter `consulter_stock`, `ajouter_photos`, `modifier_statuts`, `gerer_taches`, `modifier_prix_public`, `modifier_prix_pro`, `voir_factures_vente`, `gerer_ventes`, `importer`, `gerer_utilisateurs`, `consulter_historique`.
+- **Enum `app_role`** : ajouter `admin_principal` (unique protégé).
+- **Table `user_profiles_admin`** : `user_id`, `nom`, `statut_compte` (`actif|suspendu|desactive|en_attente`), `date_invitation`, `derniere_connexion`, `date_expiration`, `cree_par`, `modifie_par`.
+- **Table `user_invitations`** : `id`, `email`, `nom`, `role`, `permissions[]`, `date_expiration`, `message`, `token`, `invite_par`, `accepted_at`, `revoked_at`.
+- **Table `admin_audit_log`** : `id`, `acteur_id`, `cible_id`, `action` (`invitation|acceptation|role_change|perm_change|suspension|revocation|reactivation|pro_validation`), `ancienne_valeur jsonb`, `nouvelle_valeur jsonb`, `created_at`.
+- **Table `invite_pro_validations`** : `user_id`, `statut` (`en_attente|valide|refuse|suspendu`), `valide_par`, `valide_le`, `motif`.
+- **Trigger** : empêcher la suppression/rétrogradation du dernier `admin_principal` actif.
+- **Trigger** : refuser toute écriture sur `user_roles` en dehors des server functions autorisées (garde-fou en plus des RLS).
+- **RLS** : `user_profiles_admin`, `user_invitations`, `admin_audit_log`, `invite_pro_validations` — SELECT/UPDATE réservés aux users avec `gerer_utilisateurs` OU rôle `admin`/`admin_principal`.
 
-RLS :
-- `produits` : les policies existantes deviennent `WHERE trashed_at IS NULL` par défaut. Nouvelle policy admin pour voir/agir sur corbeille. DELETE réservé à `has_role(auth.uid(),'admin')`.
-- `produit_historique` : lecture propriétaire, insertion via triggers.
+### Server functions (`src/lib/admin-users.functions.ts`)
 
-Triggers :
-- `produits_audit` : INSERT/UPDATE (archivage, corbeille, restauration) → ligne dans `produit_historique`.
-- `produits_before_delete` : consigne la suppression définitive avant DELETE.
-- Le calcul auto de `statut` continue de tourner ; `ARCHIVE` n'est plus utilisé pour marquer l'archivage (on utilise `archived_at`), le statut reste celui du parcours.
+Tous avec `requireSupabaseAuth` + double check `has_permission(userId, 'gerer_utilisateurs')` OR `has_role(userId, 'admin_principal')`. `supabaseAdmin` importé dynamiquement dans le handler.
 
-Pas de suppression automatique de la corbeille (rétention manuelle).
+- `listUsers()` — join `auth.users` + `profiles` + `user_roles` + `user_permissions` + `user_profiles_admin`.
+- `inviteUser({ email, nom, role, permissions, date_expiration, message })` — appelle `auth.admin.inviteUserByEmail`, insère l'invitation, log l'audit. **Rejette explicitement `role = 'admin_principal'`.**
+- `updateUserRole({ userId, role })` — refuse si `role = admin_principal` sauf appelant est admin_principal ; refuse si tentative de retirer le dernier admin_principal ; log l'audit.
+- `updateUserPermissions({ userId, add[], remove[] })` — log ancien/nouveau.
+- `suspendUser({ userId })` / `reactivateUser({ userId })` / `revokeUser({ userId })` — met à jour `statut_compte`, révoque les sessions via `auth.admin.signOut(userId, 'global')`.
+- `resendInvitation({ invitationId })` / `expireInvitation({ invitationId })`.
+- `validateInvitePro({ userId, decision, motif })` — passe le statut de `invite_pro_validations`, ajoute/retire le rôle `invite_pro`, log.
 
-### 2. Fetchers & filtres
+### Interface
 
-`src/lib/produits.ts` : helpers `estActif(p)`, `estArchive(p)`, `estCorbeille(p)`.
+- `src/routes/_authenticated/_admin/route.tsx` — layout pathless gate qui redirige si l'user n'a pas `gerer_utilisateurs`.
+- `src/routes/_authenticated/_admin/utilisateurs.tsx` — page principale.
+- Tableau responsive (cartes empilées <768px) : nom, email, rôle, statut, permissions (badges), invité le, dernière connexion, expire le, créé/modifié par.
+- Filtres : rôle, statut, avec/sans accès financier, invité pro en attente.
+- Dialog « Inviter » — formulaire (zod : email valide, nom, rôle sans admin_principal, permissions multi-select, expiration optionnelle, message optionnel).
+- Dialog « Modifier accès » — édition rôle + permissions granulaires.
+- Section « Invités pro en attente » — approuver / refuser avec motif.
+- Bouton « Suspendre / Réactiver / Révoquer » avec confirmation.
+- Confirmation renforcée (saisie du texte `TRANSFERER` + email) pour toute modification touchant `admin_principal`.
+- `src/routes/_authenticated/_admin/audit.tsx` — journal filtrable par acteur, cible, action, période. Export CSV/XLSX (réutiliser `export-historique.ts`).
 
-Toutes les requêtes existantes (Stock, Aujourd'hui, À débloquer, Kanban, Finances/immobilisé, Qualité, Tâches liées) filtrent `archived_at IS NULL AND trashed_at IS NULL`.
+### Ajout AppShell
 
-Exceptions :
-- Finances → CA / marges réalisées : incluent les archivés vendus (`prix_vente_reel` non nul).
-- Stock : nouveau sélecteur `Actifs (défaut) | Archivés | Corbeille`.
+- Onglet « Admin » (icône Shield) visible seulement si `has('gerer_utilisateurs')` ou `isAdmin`. Sous-menu : Utilisateurs, Audit.
 
-### 3. UI — menu ⋯ sur chaque carte
+### Tests (Playwright headless, sandbox uniquement)
 
-Nouveau composant `ProduitMenu` (popover), déclenché depuis `ProduitCard` et la fiche :
-- Ouvrir la fiche
-- Modifier (→ fiche en mode édition)
-- Changer le statut (sous-menu avec liste `STATUTS`)
-- Ajouter une photo (déclenche input caméra)
-- Ajouter une tâche (mini-dialog)
-- Dupliquer (nouveau VV-XXXX, copie champs hors photos/ventes)
-- Archiver (dialog motif)
-- Mettre à la corbeille (dialog, garde-fou si vendu)
+Créer 8 comptes de test **avec préfixe `test-vv-`** (jamais tes comptes) :
 
-Le menu ⋯ remplace le clic-carte comme point d'entrée des actions ; le clic sur la zone principale reste = ouvrir la fiche.
+- `test-vv-admin@…`, `test-vv-collab-nofin@…`, `test-vv-collab-fin@…`, `test-vv-part@…`, `test-vv-pro-pending@…`, `test-vv-pro-valide@…`, `test-vv-suspendu@…`, `test-vv-invit-expiree@…`.
 
-### 4. Dialogs
+Pour chacun, vérifier :
 
-- **Archiver** : choix motif (radio), bouton Confirmer. Toast "Produit archivé — Annuler" (5 s).
-- **Mettre à la corbeille** :
-  - Si `prix_vente_reel` renseigné → écran d'avertissement "informations de vente utilisées…" avec 3 boutons : Annuler / Archiver / Continuer (Continuer visible uniquement si admin).
-  - Sinon confirmation simple. Toast "Produit placé dans la corbeille — Annuler" (5 s, restaure via update `trashed_at = null`).
-- **Supprimer définitivement** (page Corbeille uniquement, admin) :
-  - Récapitulatif : photo principale, VV-ID, marque, modèle, prix achat, prix cible, nb photos, nb tâches.
-  - Message d'irréversibilité.
-  - Champ texte : doit contenir exactement l'identifiant (`VV-0042`).
-  - Bouton rouge désactivé tant que la saisie ne correspond pas.
+1. Colonnes visibles dans la fiche produit (matrice attendue par rôle).
+2. Champs éditables (visibilité, tarifs, prix d'achat) selon permissions.
+3. Accès direct à `/produit/<uuid>` d'un produit privé → 404 pour les invités.
+4. Tentative UPDATE `user_roles` via console → refus RLS.
+5. Tentative d'appel server fn admin sans permission → 401/403.
+6. Suspension → sessions révoquées, redirection `/auth`.
+7. Invitation expirée → refus d'acceptation.
+8. Screenshot de chaque écran de la page Utilisateurs sur mobile/tablette/desktop.
 
-### 5. Nouvelle page Corbeille
+Script sous `/tmp/browser/vv-rbac/run.py`. Nettoyage automatique des 8 comptes en fin de run.
 
-`src/routes/_authenticated/corbeille.tsx` (entrée dans le menu "Plus") :
-- Liste des produits `trashed_at IS NOT NULL`.
-- Colonnes : VV, marque/modèle, date corbeille, par qui.
-- Actions : Restaurer / Supprimer définitivement (admin).
+### Livrable
 
-Filtre "Archivés" dans Stock via le sélecteur d'audience ; action "Restaurer dans le stock actif" sur chaque ligne archivée.
-
-### 6. Historique
-
-Affiché en bas de la fiche produit : liste chronologique compacte (date, acteur, action, détails).
-
-### 7. Sécurité & conventions
-
-- Rôles stockés dans `user_roles` (jamais dans `profiles`) — utilise `has_role()` SECURITY DEFINER.
-- Suppression multiple désactivée (pas d'UI de sélection multi).
-- L'identifiant d'un produit supprimé n'est jamais réattribué (les nouveaux VV sont générés via `max(source_ligne)+1` déjà en place, jamais recyclés).
-
-### Ce qui ne change pas
-- Design (crème / bordeaux / laiton, serif).
-- Les 137 produits, leurs identifiants VV-xxxx, statuts, photos, tâches.
-- Les autres écrans (juste le filtre actif/archivé/corbeille en amont).
-
----
-
-Je lance la migration (schéma + rôle admin + triggers historique) dès ta validation, puis j'enchaîne UI (menu ⋯, dialogs, page Corbeille, historique fiche) dans la foulée. OK ?
+- 1 migration (correctifs Étape 8 + tables Étape 9).
+- Server functions admin.
+- Pages `/utilisateurs` et `/audit` sous gate `_admin`.
+- Rapport de tests Playwright avec matrice de permissions vérifiée.
+- Mise à jour `mem://` pour tracer les décisions (rôles, gates, tables).
