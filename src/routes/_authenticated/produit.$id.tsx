@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useRouter, Link } from "@tanstack/react-r
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getProduitInterne, updateProduit } from "@/lib/produits-api";
 import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
   STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
@@ -49,9 +50,8 @@ function Fiche() {
   const q = useQuery({
     queryKey: ["produit", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").eq("id", id).maybeSingle();
-      if (error) throw error;
-      return (data as unknown as Produit) ?? null;
+      const row = await getProduitInterne(id);
+      return (row as unknown as Produit) ?? null;
     },
     retry: false,
   });
@@ -59,8 +59,7 @@ function Fiche() {
 
   const updateMut = useMutation({
     mutationFn: async (patch: Partial<Produit>) => {
-      const { error } = await supabase.from("produits").update(patch as never).eq("id", id);
-      if (error) throw error;
+      await updateProduit(id, patch as Record<string, unknown>);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["produit", id] });
@@ -79,8 +78,7 @@ function Fiche() {
       const { data: signed } = await supabase.storage.from("produit-photos").createSignedUrl(path, 60 * 60 * 24 * 365);
       const existing = (q.data?.photos as Array<{ url: string; storage_path: string }>) ?? [];
       const next = [...existing, { url: signed?.signedUrl ?? "", storage_path: path }];
-      const { error: updErr } = await supabase.from("produits").update({ photos: next as never }).eq("id", id);
-      if (updErr) throw updErr;
+      await updateProduit(id, { photos: next });
     },
     onSuccess: () => {
       toast.success("Photo ajoutée.");

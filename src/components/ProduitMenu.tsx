@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { MoreVertical, ExternalLink, Pencil, RefreshCw, Camera, ListPlus, Copy, Archive, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { updateProduit } from "@/lib/produits-api";
 import {
   STATUTS,
   STATUT_LABEL,
@@ -40,11 +41,7 @@ export function ProduitMenu({ p, onOpenEdit }: { p: Produit; onOpenEdit?: () => 
 
   const statutMut = useMutation({
     mutationFn: async (s: Statut) => {
-      const { error } = await supabase
-        .from("produits")
-        .update({ statut: s, statut_modifie_manuellement: true } as never)
-        .eq("id", p.id);
-      if (error) throw error;
+      await updateProduit(p.id, { statut: s, statut_modifie_manuellement: true });
     },
     onSuccess: () => { toast.success("Statut mis à jour."); invalidate(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
@@ -62,8 +59,7 @@ export function ProduitMenu({ p, onOpenEdit }: { p: Produit; onOpenEdit?: () => 
         .createSignedUrl(path, 60 * 60 * 24 * 365);
       const existing = (p.photos ?? []) as Array<{ url: string; storage_path: string }>;
       const next = [...existing, { url: signed?.signedUrl ?? "", storage_path: path }];
-      const { error } = await supabase.from("produits").update({ photos: next as never }).eq("id", p.id);
-      if (error) throw error;
+      await updateProduit(p.id, { photos: next });
     },
     onSuccess: () => { toast.success("Photo ajoutée."); invalidate(); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
