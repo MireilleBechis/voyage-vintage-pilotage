@@ -2,9 +2,13 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL } from "@/lib/produits";
+import {
+  STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
+  STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
+  ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
+} from "@/lib/produits";
 import { eur, dateFr, anciennete } from "@/lib/format";
-import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
@@ -156,16 +160,64 @@ function Fiche() {
         )}
 
         {/* Statut */}
-        <Field label="Statut" editing={editing}
-          value={STATUT_LABEL[p.statut]}
-          input={
-            <select value={p.statut}
-              onChange={(e) => updateMut.mutate({ statut: e.target.value as Statut })}
-              className="w-full rounded-md border bg-card px-2 py-1.5 text-sm">
+        {/* Statut + verrou manuel */}
+        <div className="border rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Statut</p>
+            <button
+              onClick={() => updateMut.mutate({ statut_modifie_manuellement: !p.statut_modifie_manuellement })}
+              className="text-[10px] inline-flex items-center gap-1 px-1.5 py-0.5 rounded border bg-card text-muted-foreground"
+              title={p.statut_modifie_manuellement ? "Statut verrouillé (manuel). Cliquer pour redonner la main au calcul auto." : "Verrouiller ce statut pour empêcher le recalcul automatique."}
+            >
+              {p.statut_modifie_manuellement ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+              {p.statut_modifie_manuellement ? "Verrouillé" : "Auto"}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className={`text-xs px-2 py-1 rounded border ${STATUT_COULEUR[p.statut]}`}>
+              {STATUT_LABEL[p.statut]}
+            </span>
+            <select
+              value={p.statut}
+              onChange={(e) => updateMut.mutate({
+                statut: e.target.value as Statut,
+                statut_modifie_manuellement: true,
+              }, { onSuccess: () => toast.success("Statut modifié manuellement (verrouillé).") })}
+              className="flex-1 rounded-md border bg-card px-2 py-1.5 text-sm"
+            >
               {STATUTS.map((s) => <option key={s} value={s}>{STATUT_LABEL[s]}</option>)}
             </select>
-          }
-        />
+          </div>
+        </div>
+
+        {/* Actions requises */}
+        {p.actions_requises && p.actions_requises.length > 0 && (
+          <div className="space-y-1.5">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Actions requises</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(p.actions_requises as ActionRequise[]).map((a) => (
+                <span key={a} className={`text-[10px] px-1.5 py-0.5 rounded border ${ACTION_REQUISE_COULEUR[a]}`}>
+                  {ACTION_REQUISE_LABEL[a]}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <SectionTitle>État & travaux</SectionTitle>
+        <Grid>
+          <EtatSelect
+            label="Nettoyage"
+            value={p.nettoyage}
+            onSave={(v) => updateMut.mutate({ nettoyage: v })}
+          />
+          <EtatSelect
+            label="Restauration"
+            value={p.restauration}
+            onSave={(v) => updateMut.mutate({ restauration: v })}
+          />
+        </Grid>
+
 
         <SectionTitle>Finances</SectionTitle>
         <Grid>
@@ -244,14 +296,23 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
 
-function Field({ label, value, input, editing }: { label: string; value: string; input?: React.ReactNode; editing: boolean }) {
+function EtatSelect({ label, value, onSave }: {
+  label: string; value: EtatTravaux; onSave: (v: EtatTravaux) => void;
+}) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      {editing && input ? input : <p className="text-sm mt-0.5">{value}</p>}
+      <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onSave(e.target.value as EtatTravaux)}
+        className="mt-0.5 w-full rounded-md border bg-card px-2 py-1.5 text-sm"
+      >
+        {ETATS_TRAVAUX.map((e) => <option key={e} value={e}>{ETAT_TRAVAUX_LABEL[e]}</option>)}
+      </select>
     </div>
   );
 }
+
 
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
