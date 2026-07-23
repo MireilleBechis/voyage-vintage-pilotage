@@ -559,6 +559,26 @@ function EtatSelect({ label, value, onSave }: {
 }
 
 
+function SelectField({ label, value, options, onSave }: {
+  label: string;
+  value: string;
+  options: Array<{ value: string; label: string }>;
+  onSave: (v: string) => void;
+}) {
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
+      <select
+        value={value}
+        onChange={(e) => onSave(e.target.value)}
+        className="w-full mt-1 rounded-md border bg-card px-2 py-1.5 text-sm"
+      >
+        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+  );
+}
+
 function ReadOnly({ label, value }: { label: string; value: string }) {
   return (
     <div>
