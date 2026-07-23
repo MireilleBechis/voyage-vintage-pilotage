@@ -85,7 +85,25 @@ function Fiche() {
   });
 
   if (q.isLoading) return <div className="container-app py-6 text-muted-foreground">Chargement…</div>;
-  if (q.isError || !q.data) return <div className="container-app py-6 text-destructive">Produit introuvable.</div>;
+  if (q.isError || !q.data) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center container-app py-10">
+        <div className="text-center max-w-sm">
+          <p className="text-xs uppercase tracking-[0.3em] text-brass">Voyage Vintage</p>
+          <h1 className="font-serif text-3xl text-primary mt-2">Produit introuvable</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            L'identifiant demandé n'existe pas ou vous n'y avez pas accès.
+          </p>
+          <Link
+            to="/stock"
+            className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2.5 text-sm"
+          >
+            <ChevronLeft className="w-4 h-4" /> Retour au stock
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const p = q.data;
   const doubts = p.donnees_douteuses as Record<string, unknown> | null;
@@ -95,9 +113,10 @@ function Fiche() {
     <div className="pb-8">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b">
         <div className="container-app py-3 flex items-center justify-between">
-          <button onClick={() => navigate({ to: "/stock" })} className="flex items-center gap-1 text-sm">
+          <button onClick={retour} className="flex items-center gap-1 text-sm" aria-label="Retour à la liste">
             <ChevronLeft className="w-4 h-4" /> Retour
           </button>
+
           <div className="flex items-center gap-2">
             <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
               {editing ? "Terminer" : "Modifier"}
