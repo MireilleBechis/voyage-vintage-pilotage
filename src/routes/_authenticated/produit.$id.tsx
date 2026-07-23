@@ -87,11 +87,39 @@ function Fiche() {
           <button onClick={() => navigate({ to: "/stock" })} className="flex items-center gap-1 text-sm">
             <ChevronLeft className="w-4 h-4" /> Retour
           </button>
-          <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
-            {editing ? "Terminer" : "Modifier"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
+              {editing ? "Terminer" : "Modifier"}
+            </button>
+            <ProduitMenu p={p} onOpenEdit={() => setEditing(true)} />
+          </div>
         </div>
       </div>
+
+      {p.archived_at && (
+        <div className="container-app pt-3">
+          <div className="border border-warning/40 bg-warning/10 rounded-lg p-3 flex items-center justify-between gap-2">
+            <div className="text-xs">
+              <p className="font-medium flex items-center gap-1.5">
+                <Archive className="w-3.5 h-3.5" /> Produit archivé
+              </p>
+              <p className="text-muted-foreground">
+                {p.archive_motif ? MOTIF_ARCHIVAGE_LABEL[p.archive_motif] : "—"} · {dateFr(p.archived_at)}
+              </p>
+            </div>
+            <button
+              onClick={() => restaurerArchive(p.id).then(() => {
+                toast.success("Restauré.");
+                qc.invalidateQueries({ queryKey: ["produit", id] });
+                qc.invalidateQueries({ queryKey: ["produits"] });
+              }).catch((e) => toast.error(e instanceof Error ? e.message : "Erreur"))}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border bg-background"
+            >
+              <RotateCcw className="w-3 h-3" /> Restaurer
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Photos */}
       <div className="bg-secondary/40">
