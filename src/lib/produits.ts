@@ -289,3 +289,90 @@ export function margeReelle(p: Pick<Produit, "statut" | "prix_vente_reel" | "cou
   if (p.statut !== "VENDU" || p.prix_vente_reel == null) return null;
   return Number(p.prix_vente_reel) - Number(p.cout_total ?? 0);
 }
+
+// ============================================================
+// Étape 8 — Rôles, permissions, visibilité, tarifs multi-niveaux
+// ============================================================
+
+export const ROLES = ["admin", "collaborateur", "invite_particulier", "invite_pro"] as const;
+export type AppRole = (typeof ROLES)[number];
+export const ROLE_LABEL: Record<AppRole, string> = {
+  admin: "Administrateur",
+  collaborateur: "Collaborateur",
+  invite_particulier: "Invité particulier",
+  invite_pro: "Invité professionnel",
+};
+
+export const PERMISSIONS = [
+  "voir_prix_achat",
+  "voir_marges",
+  "modifier_prix",
+  "voir_factures_achat",
+  "creer_produit",
+  "modifier_produit",
+  "archiver_produit",
+  "exporter",
+] as const;
+export type Permission = (typeof PERMISSIONS)[number];
+export const PERMISSION_LABEL: Record<Permission, string> = {
+  voir_prix_achat: "Voir les prix d'achat",
+  voir_marges: "Voir les marges",
+  modifier_prix: "Modifier les prix",
+  voir_factures_achat: "Voir les factures d'achat",
+  creer_produit: "Créer un produit",
+  modifier_produit: "Modifier un produit",
+  archiver_produit: "Archiver un produit",
+  exporter: "Exporter des données",
+};
+
+export const VISIBILITES = ["PRIVE", "PARTICULIER", "PRO", "TOUS", "MASQUE"] as const;
+export type Visibilite = (typeof VISIBILITES)[number];
+export const VISIBILITE_LABEL: Record<Visibilite, string> = {
+  PRIVE: "Privé",
+  PARTICULIER: "Visible aux particuliers invités",
+  PRO: "Visible aux professionnels invités",
+  TOUS: "Visible à tous les invités",
+  MASQUE: "Masqué temporairement",
+};
+
+export const DISPONIBILITES = ["DISPONIBLE", "RESERVE", "VENDU", "NON_DISPONIBLE", "SUR_DEMANDE"] as const;
+export type Disponibilite = (typeof DISPONIBILITES)[number];
+export const DISPONIBILITE_LABEL: Record<Disponibilite, string> = {
+  DISPONIBLE: "Disponible",
+  RESERVE: "Réservé",
+  VENDU: "Vendu",
+  NON_DISPONIBLE: "Non disponible",
+  SUR_DEMANDE: "Sur demande",
+};
+
+export const TVA_REGIMES = ["marge", "normal"] as const;
+export type TvaRegime = (typeof TVA_REGIMES)[number];
+export const TVA_REGIME_LABEL: Record<TvaRegime, string> = {
+  marge: "Marge bénéficiaire (biens d'occasion)",
+  normal: "TVA normale",
+};
+
+export type ValidationStatut = "brouillon" | "valide";
+export const VALIDATION_LABEL: Record<ValidationStatut, string> = {
+  brouillon: "Brouillon",
+  valide: "Validé",
+};
+
+/**
+ * Calcule le prix professionnel TTC selon le régime de TVA.
+ * - Régime normal : TTC = HT × (1 + taux/100)
+ * - Régime marge (art. 297 A CGI) : la TVA porte sur la marge, pas sur le prix total.
+ *   Sans coût d'acquisition on ne peut pas la calculer côté vitrine → on affiche le HT tel quel.
+ */
+export function calculerPrixProTtc(
+  prixHt: number | null,
+  regime: TvaRegime,
+  tauxTva: number | null,
+): number | null {
+  if (prixHt == null) return null;
+  if (regime === "normal" && tauxTva != null) {
+    return Math.round(prixHt * (1 + tauxTva / 100) * 100) / 100;
+  }
+  // Régime marge : le HT affiché est déjà le prix payé par le pro (TVA sur marge invisible côté acheteur)
+  return prixHt;
+}
