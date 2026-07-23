@@ -13,6 +13,7 @@ import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Loc
 import { toast } from "sonner";
 import { ProduitMenu } from "@/components/ProduitMenu";
 import { restaurerArchive } from "@/lib/produit-actions";
+import { exportHistoriqueCsv, exportHistoriqueXlsx } from "@/lib/export-historique";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   head: () => ({
@@ -331,30 +332,43 @@ function HistoriqueProduit({ produitId }: { produitId: string }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("produit_historique" as never)
-        .select("id, action, acteur_email, created_at, details")
+        .select("id, produit_id, identifiant, action, acteur_email, created_at, details")
         .eq("produit_id", produitId)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(200);
       if (error) throw error;
       return (data ?? []) as unknown as Array<{
-        id: string; action: string; acteur_email: string | null; created_at: string; details: Record<string, unknown> | null;
+        id: string; produit_id: string; identifiant: string | null; action: string; acteur_email: string | null; created_at: string; details: Record<string, unknown> | null;
       }>;
     },
   });
   const list = q.data ?? [];
-  if (list.length === 0) return <p className="text-xs text-muted-foreground italic">Aucune action enregistrée.</p>;
   return (
-    <ul className="text-xs space-y-1">
-      {list.map((h) => (
-        <li key={h.id} className="flex justify-between gap-2 border-b py-1">
-          <span>
-            <span className="font-medium">{ACTION_HISTORIQUE_LABEL[h.action] ?? h.action}</span>
-            {h.acteur_email && <span className="text-muted-foreground"> · {h.acteur_email}</span>}
-          </span>
-          <span className="text-muted-foreground shrink-0">{dateFr(h.created_at)}</span>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-2">
+      {list.length > 0 && (
+        <div className="flex gap-2 justify-end">
+          <button onClick={() => exportHistoriqueCsv(list, `historique-${list[0]?.identifiant ?? produitId}.csv`)}
+            className="text-[11px] px-2 py-1 rounded border bg-card">CSV</button>
+          <button onClick={() => exportHistoriqueXlsx(list, `historique-${list[0]?.identifiant ?? produitId}.xlsx`)}
+            className="text-[11px] px-2 py-1 rounded border bg-card">Excel</button>
+        </div>
+      )}
+      {list.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">Aucune action enregistrée.</p>
+      ) : (
+        <ul className="text-xs space-y-1">
+          {list.map((h) => (
+            <li key={h.id} className="flex justify-between gap-2 border-b py-1">
+              <span>
+                <span className="font-medium">{ACTION_HISTORIQUE_LABEL[h.action] ?? h.action}</span>
+                {h.acteur_email && <span className="text-muted-foreground"> · {h.acteur_email}</span>}
+              </span>
+              <span className="text-muted-foreground shrink-0">{dateFr(h.created_at)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

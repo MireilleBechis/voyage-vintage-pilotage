@@ -17,6 +17,7 @@ import { Route as AuthenticatedTachesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticated/qualite'
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
+import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
 import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticated/finances'
 import { Route as AuthenticatedDebloquerRouteImport } from './routes/_authenticated/debloquer'
 import { Route as AuthenticatedCorbeilleRouteImport } from './routes/_authenticated/corbeille'
@@ -62,6 +63,11 @@ const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
   path: '/kanban',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHistoriqueRoute = AuthenticatedHistoriqueRouteImport.update({
+  id: '/historique',
+  path: '/historique',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFinancesRoute = AuthenticatedFinancesRouteImport.update({
   id: '/finances',
   path: '/finances',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
   '/finances': typeof AuthenticatedFinancesRoute
+  '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/corbeille': typeof AuthenticatedCorbeilleRoute
   '/debloquer': typeof AuthenticatedDebloquerRoute
   '/finances': typeof AuthenticatedFinancesRoute
+  '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/_authenticated/corbeille': typeof AuthenticatedCorbeilleRoute
   '/_authenticated/debloquer': typeof AuthenticatedDebloquerRoute
   '/_authenticated/finances': typeof AuthenticatedFinancesRoute
+  '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
   '/_authenticated/qualite': typeof AuthenticatedQualiteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/corbeille'
     | '/debloquer'
     | '/finances'
+    | '/historique'
     | '/kanban'
     | '/qualite'
     | '/stock'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/corbeille'
     | '/debloquer'
     | '/finances'
+    | '/historique'
     | '/kanban'
     | '/qualite'
     | '/stock'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/_authenticated/corbeille'
     | '/_authenticated/debloquer'
     | '/_authenticated/finances'
+    | '/_authenticated/historique'
     | '/_authenticated/kanban'
     | '/_authenticated/qualite'
     | '/_authenticated/stock'
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKanbanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/historique': {
+      id: '/_authenticated/historique'
+      path: '/historique'
+      fullPath: '/historique'
+      preLoaderRoute: typeof AuthenticatedHistoriqueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/finances': {
       id: '/_authenticated/finances'
       path: '/finances'
@@ -285,6 +304,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCorbeilleRoute: typeof AuthenticatedCorbeilleRoute
   AuthenticatedDebloquerRoute: typeof AuthenticatedDebloquerRoute
   AuthenticatedFinancesRoute: typeof AuthenticatedFinancesRoute
+  AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
   AuthenticatedQualiteRoute: typeof AuthenticatedQualiteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
@@ -298,6 +318,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCorbeilleRoute: AuthenticatedCorbeilleRoute,
   AuthenticatedDebloquerRoute: AuthenticatedDebloquerRoute,
   AuthenticatedFinancesRoute: AuthenticatedFinancesRoute,
+  AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
   AuthenticatedQualiteRoute: AuthenticatedQualiteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,

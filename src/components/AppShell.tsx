@@ -16,6 +16,7 @@ const MORE = [
   { to: "/debloquer", label: "À débloquer" },
   { to: "/ventes", label: "Ventes" },
   { to: "/qualite", label: "Qualité des données" },
+  { to: "/historique", label: "Historique" },
   { to: "/corbeille", label: "Corbeille" },
 ] as const;
 
