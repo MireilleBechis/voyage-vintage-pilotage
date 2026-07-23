@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import type { Produit, Statut } from "@/lib/produits";
 import { ProduitCard } from "@/components/ProduitCard";
 
@@ -26,9 +26,10 @@ function Ventes() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("trashed_at", null).order("updated_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !p.trashed_at)
+        .sort((a, b) => (b.updated_at ?? "").localeCompare(a.updated_at ?? ""));
     },
   });
   const list = (q.data ?? []).filter((p) => p.statut === tab);
