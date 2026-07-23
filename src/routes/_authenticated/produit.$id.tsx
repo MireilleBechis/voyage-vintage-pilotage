@@ -13,6 +13,7 @@ import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Loc
 import { toast } from "sonner";
 import { ProduitMenu } from "@/components/ProduitMenu";
 import { restaurerArchive } from "@/lib/produit-actions";
+import { exportHistoriqueCsv, exportHistoriqueXlsx } from "@/lib/export-historique";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   head: () => ({
