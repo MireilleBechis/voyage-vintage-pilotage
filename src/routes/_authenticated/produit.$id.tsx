@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
@@ -28,18 +28,28 @@ export const Route = createFileRoute("/_authenticated/produit/$id")({
 function Fiche() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const router = useRouter();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const retour = useCallback(() => {
+    // Préserve la recherche/filtres/tri/scroll de la liste précédente.
+    const canGoBack = typeof window !== "undefined" && window.history.length > 1;
+    if (canGoBack) router.history.back();
+    else navigate({ to: "/stock" });
+  }, [navigate, router]);
+
   const q = useQuery({
     queryKey: ["produit", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").eq("id", id).single();
+      const { data, error } = await supabase.from("produits").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data as unknown as Produit;
+      return (data as unknown as Produit) ?? null;
     },
+    retry: false,
   });
+
 
   const updateMut = useMutation({
     mutationFn: async (patch: Partial<Produit>) => {
@@ -75,7 +85,25 @@ function Fiche() {
   });
 
   if (q.isLoading) return <div className="container-app py-6 text-muted-foreground">Chargement…</div>;
-  if (q.isError || !q.data) return <div className="container-app py-6 text-destructive">Produit introuvable.</div>;
+  if (q.isError || !q.data) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center container-app py-10">
+        <div className="text-center max-w-sm">
+          <p className="text-xs uppercase tracking-[0.3em] text-brass">Voyage Vintage</p>
+          <h1 className="font-serif text-3xl text-primary mt-2">Produit introuvable</h1>
+          <p className="text-sm text-muted-foreground mt-2">
+            L'identifiant demandé n'existe pas ou vous n'y avez pas accès.
+          </p>
+          <Link
+            to="/stock"
+            className="mt-6 inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2.5 text-sm"
+          >
+            <ChevronLeft className="w-4 h-4" /> Retour au stock
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const p = q.data;
   const doubts = p.donnees_douteuses as Record<string, unknown> | null;
@@ -85,9 +113,10 @@ function Fiche() {
     <div className="pb-8">
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b">
         <div className="container-app py-3 flex items-center justify-between">
-          <button onClick={() => navigate({ to: "/stock" })} className="flex items-center gap-1 text-sm">
+          <button onClick={retour} className="flex items-center gap-1 text-sm" aria-label="Retour à la liste">
             <ChevronLeft className="w-4 h-4" /> Retour
           </button>
+
           <div className="flex items-center gap-2">
             <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
               {editing ? "Terminer" : "Modifier"}
@@ -140,8 +169,11 @@ function Fiche() {
       <div className="container-app py-4 space-y-4">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-brass">
-              {p.identifiant} · {CAT_LABEL[p.categorie]}{p.sous_categorie ? ` · ${p.sous_categorie}` : ""}
+            <p className="text-sm font-mono font-medium text-brass tracking-widest">
+              {p.identifiant}
+            </p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
+              {CAT_LABEL[p.categorie]}{p.sous_categorie ? ` · ${p.sous_categorie}` : ""}
             </p>
             <h1 className="font-serif text-3xl leading-tight mt-1">{p.designer_ou_marque ?? "—"}</h1>
             <p className="text-sm text-muted-foreground">
