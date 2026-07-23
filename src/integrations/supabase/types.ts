@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       produits: {
         Row: {
+          actions_requises: string[]
           annee: string | null
           blocage: string | null
           cabinet: string | null
@@ -50,6 +51,7 @@ export type Database = {
           marge_potentielle: number | null
           materiaux: string | null
           modele: string | null
+          nettoyage: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort: number | null
           notes: string | null
           owner_id: string
@@ -63,6 +65,7 @@ export type Database = {
           prix_vente_reel: number | null
           prochaine_action: string | null
           puissance: string | null
+          restauration: Database["public"]["Enums"]["etat_restauration"]
           revetement: string | null
           sensibilite: string | null
           shopify_product_id: string | null
@@ -70,11 +73,16 @@ export type Database = {
           source_ligne: number | null
           sous_categorie: string | null
           statut: Database["public"]["Enums"]["statut_produit"]
+          statut_calcule_le: string | null
+          statut_modifie_manuellement: boolean
+          statut_origine: Database["public"]["Enums"]["origine_statut"]
+          titre_commercial: string | null
           type_objet: string | null
           updated_at: string
           woodcase: string | null
         }
         Insert: {
+          actions_requises?: string[]
           annee?: string | null
           blocage?: string | null
           cabinet?: string | null
@@ -109,6 +117,7 @@ export type Database = {
           marge_potentielle?: number | null
           materiaux?: string | null
           modele?: string | null
+          nettoyage?: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort?: number | null
           notes?: string | null
           owner_id: string
@@ -122,6 +131,7 @@ export type Database = {
           prix_vente_reel?: number | null
           prochaine_action?: string | null
           puissance?: string | null
+          restauration?: Database["public"]["Enums"]["etat_restauration"]
           revetement?: string | null
           sensibilite?: string | null
           shopify_product_id?: string | null
@@ -129,11 +139,16 @@ export type Database = {
           source_ligne?: number | null
           sous_categorie?: string | null
           statut?: Database["public"]["Enums"]["statut_produit"]
+          statut_calcule_le?: string | null
+          statut_modifie_manuellement?: boolean
+          statut_origine?: Database["public"]["Enums"]["origine_statut"]
+          titre_commercial?: string | null
           type_objet?: string | null
           updated_at?: string
           woodcase?: string | null
         }
         Update: {
+          actions_requises?: string[]
           annee?: string | null
           blocage?: string | null
           cabinet?: string | null
@@ -168,6 +183,7 @@ export type Database = {
           marge_potentielle?: number | null
           materiaux?: string | null
           modele?: string | null
+          nettoyage?: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort?: number | null
           notes?: string | null
           owner_id?: string
@@ -181,6 +197,7 @@ export type Database = {
           prix_vente_reel?: number | null
           prochaine_action?: string | null
           puissance?: string | null
+          restauration?: Database["public"]["Enums"]["etat_restauration"]
           revetement?: string | null
           sensibilite?: string | null
           shopify_product_id?: string | null
@@ -188,6 +205,10 @@ export type Database = {
           source_ligne?: number | null
           sous_categorie?: string | null
           statut?: Database["public"]["Enums"]["statut_produit"]
+          statut_calcule_le?: string | null
+          statut_modifie_manuellement?: boolean
+          statut_origine?: Database["public"]["Enums"]["origine_statut"]
+          titre_commercial?: string | null
           type_objet?: string | null
           updated_at?: string
           woodcase?: string | null
@@ -279,6 +300,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculer_actions_requises: {
+        Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
+        Returns: string[]
+      }
+      calculer_statut_produit: {
+        Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
+        Returns: Database["public"]["Enums"]["statut_produit"]
+      }
       marge_reelle: {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: number
@@ -294,9 +323,17 @@ export type Database = {
         | "canapes"
         | "luminaires"
         | "autre"
+      etat_nettoyage: "a_verifier" | "necessaire" | "non_necessaire" | "termine"
+      etat_restauration:
+        | "a_verifier"
+        | "necessaire"
+        | "non_necessaire"
+        | "terminee"
+      origine_statut: "automatique" | "manuel"
       statut_produit:
         | "A_IDENTIFIER"
         | "A_EXPERTISER"
+        | "ETAT_A_VERIFIER"
         | "A_NETTOYER"
         | "A_RESTAURER"
         | "A_PHOTOGRAPHIER"
@@ -317,6 +354,13 @@ export type Database = {
         | "expertise"
         | "identification"
         | "autre"
+        | "expertiser_prix"
+        | "verifier_etat"
+        | "verifier_authenticite"
+        | "mesurer"
+        | "tester"
+        | "emballer"
+        | "relancer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -454,9 +498,18 @@ export const Constants = {
         "luminaires",
         "autre",
       ],
+      etat_nettoyage: ["a_verifier", "necessaire", "non_necessaire", "termine"],
+      etat_restauration: [
+        "a_verifier",
+        "necessaire",
+        "non_necessaire",
+        "terminee",
+      ],
+      origine_statut: ["automatique", "manuel"],
       statut_produit: [
         "A_IDENTIFIER",
         "A_EXPERTISER",
+        "ETAT_A_VERIFIER",
         "A_NETTOYER",
         "A_RESTAURER",
         "A_PHOTOGRAPHIER",
@@ -478,6 +531,13 @@ export const Constants = {
         "expertise",
         "identification",
         "autre",
+        "expertiser_prix",
+        "verifier_etat",
+        "verifier_authenticite",
+        "mesurer",
+        "tester",
+        "emballer",
+        "relancer",
       ],
     },
   },
