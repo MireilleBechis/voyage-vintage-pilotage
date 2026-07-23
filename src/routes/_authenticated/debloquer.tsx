@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { listProduitsInterne } from "@/lib/produits-api";
 import type { Produit, ActionRequise } from "@/lib/produits";
 import { ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR } from "@/lib/produits";
 import { ProduitCard } from "@/components/ProduitCard";
@@ -29,9 +29,10 @@ function Debloquer() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null).order("cout_total", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Produit[];
+      const all = await listProduitsInterne();
+      return all
+        .filter((p) => !p.archived_at && !p.trashed_at)
+        .sort((a, b) => Number(b.cout_total ?? 0) - Number(a.cout_total ?? 0));
     },
   });
   const list = (q.data ?? []).filter((p) => !["VENDU", "ARCHIVE"].includes(p.statut));

@@ -176,6 +176,7 @@ export interface Produit {
   doublon_groupe: string | null;
   doublon_valide: boolean;
   created_at: string;
+  updated_at: string | null;
   archived_at: string | null;
   archived_by: string | null;
   archive_motif: MotifArchivage | null;
