@@ -306,6 +306,46 @@ function Fiche() {
             value={p.prix_vente_reel} onSave={(v) => updateMut.mutate({ prix_vente_reel: v as number })} display={eur(p.prix_vente_reel)} />
         </Grid>
 
+        {role.isInterne && (
+          <>
+            <SectionTitle>Visibilité & tarifs invités</SectionTitle>
+            <Grid>
+              <SelectField
+                label="Visibilité"
+                value={p.visibilite}
+                options={VISIBILITES.map((v) => ({ value: v, label: VISIBILITE_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ visibilite: v as Visibilite })}
+              />
+              <SelectField
+                label="Disponibilité"
+                value={p.disponibilite}
+                options={DISPONIBILITES.map((v) => ({ value: v, label: DISPONIBILITE_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ disponibilite: v as Disponibilite })}
+              />
+              <TextField label="Prix public TTC (€)" editing={editing} type="number"
+                value={p.prix_public_ttc} onSave={(v) => updateMut.mutate({ prix_public_ttc: v as number })} display={eur(p.prix_public_ttc)} />
+              <TextField label="Prix pro HT (€)" editing={editing} type="number"
+                value={p.prix_pro_ht} onSave={(v) => updateMut.mutate({ prix_pro_ht: v as number })} display={eur(p.prix_pro_ht)} />
+              <SelectField
+                label="Régime TVA"
+                value={p.tva_regime}
+                options={TVA_REGIMES.map((v) => ({ value: v, label: TVA_REGIME_LABEL[v] }))}
+                onSave={(v) => updateMut.mutate({ tva_regime: v as TvaRegime })}
+              />
+              <TextField label="Taux TVA (%)" editing={editing} type="number"
+                value={p.tva_taux} onSave={(v) => updateMut.mutate({ tva_taux: v as number })} display={p.tva_taux != null ? `${p.tva_taux} %` : "—"} />
+              <ReadOnly label="Prix pro TTC (calc.)" value={eur(calculerPrixProTtc(p.prix_pro_ht, p.tva_regime, p.tva_taux))} />
+              <TextField label="Prix minimum interne (€)" editing={editing} type="number"
+                value={p.prix_minimum_interne} onSave={(v) => updateMut.mutate({ prix_minimum_interne: v as number })} display={eur(p.prix_minimum_interne)} />
+            </Grid>
+            <p className="text-[11px] text-muted-foreground">
+              Le prix minimum interne n'est jamais visible par les invités. Le régime « marge bénéficiaire » (art. 297 A CGI) n'affiche pas la TVA à l'acheteur.
+            </p>
+          </>
+        )}
+
+
+
         <SectionTitle>Identification</SectionTitle>
         <Grid>
           <TextField label="Designer / marque" editing={editing} value={p.designer_ou_marque}
