@@ -3,6 +3,7 @@ import { Home, Package, Kanban, Coins, MoreHorizontal } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRole } from "@/hooks/useRole";
 
 const NAV = [
   { to: "/aujourdhui", label: "Aujourd'hui", icon: Home },
