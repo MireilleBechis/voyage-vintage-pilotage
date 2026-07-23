@@ -37,6 +37,16 @@ export function dateFr(value: string | Date | null | undefined): string {
   }
 }
 
+export function fmtDateHeure(value: string | Date | null | undefined): string {
+  if (!value) return "—";
+  const d = typeof value === "string" ? parseISO(value) : value;
+  try {
+    return format(d, "dd/MM/yyyy HH:mm", { locale: fr });
+  } catch {
+    return "—";
+  }
+}
+
 export function anciennete(value: string | Date | null | undefined): string {
   if (!value) return "—";
   const d = typeof value === "string" ? parseISO(value) : value;
