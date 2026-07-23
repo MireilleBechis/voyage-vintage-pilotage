@@ -176,7 +176,52 @@ export interface Produit {
   doublon_groupe: string | null;
   doublon_valide: boolean;
   created_at: string;
+  archived_at: string | null;
+  archived_by: string | null;
+  archive_motif: MotifArchivage | null;
+  trashed_at: string | null;
+  trashed_by: string | null;
 }
+
+export const MOTIFS_ARCHIVAGE = [
+  "vendu_anterieurement",
+  "retire_vente",
+  "conservation_perso",
+  "donne",
+  "perdu_endommage",
+  "erreur_saisie",
+  "autre",
+] as const;
+export type MotifArchivage = (typeof MOTIFS_ARCHIVAGE)[number];
+export const MOTIF_ARCHIVAGE_LABEL: Record<MotifArchivage, string> = {
+  vendu_anterieurement: "Vendu antérieurement",
+  retire_vente: "Retiré de la vente",
+  conservation_perso: "Conservé personnellement",
+  donne: "Donné",
+  perdu_endommage: "Perdu ou endommagé",
+  erreur_saisie: "Erreur de saisie",
+  autre: "Autre",
+};
+
+export function estArchive(p: Pick<Produit, "archived_at">): boolean {
+  return p.archived_at != null;
+}
+export function estCorbeille(p: Pick<Produit, "trashed_at">): boolean {
+  return p.trashed_at != null;
+}
+export function estActif(p: Pick<Produit, "archived_at" | "trashed_at">): boolean {
+  return p.archived_at == null && p.trashed_at == null;
+}
+
+export const ACTION_HISTORIQUE_LABEL: Record<string, string> = {
+  cree: "Créé",
+  modifie: "Modifié",
+  archive: "Archivé",
+  restaure_archive: "Restauré depuis les archives",
+  corbeille: "Mis à la corbeille",
+  restaure_corbeille: "Restauré depuis la corbeille",
+  supprime: "Supprimé définitivement",
+};
 
 export const ETATS_TRAVAUX = ["a_verifier", "non_necessaire", "necessaire", "en_cours", "termine"] as const;
 export type EtatTravaux = (typeof ETATS_TRAVAUX)[number];

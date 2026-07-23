@@ -6,11 +6,13 @@ import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
   STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
-  ACTION_LABEL, type TypeAction,
+  ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
 } from "@/lib/produits";
 import { eur, dateFr, anciennete } from "@/lib/format";
-import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock } from "lucide-react";
+import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { ProduitMenu } from "@/components/ProduitMenu";
+import { restaurerArchive } from "@/lib/produit-actions";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   head: () => ({
@@ -85,11 +87,39 @@ function Fiche() {
           <button onClick={() => navigate({ to: "/stock" })} className="flex items-center gap-1 text-sm">
             <ChevronLeft className="w-4 h-4" /> Retour
           </button>
-          <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
-            {editing ? "Terminer" : "Modifier"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setEditing((v) => !v)} className="text-sm text-primary font-medium">
+              {editing ? "Terminer" : "Modifier"}
+            </button>
+            <ProduitMenu p={p} onOpenEdit={() => setEditing(true)} />
+          </div>
         </div>
       </div>
+
+      {p.archived_at && (
+        <div className="container-app pt-3">
+          <div className="border border-warning/40 bg-warning/10 rounded-lg p-3 flex items-center justify-between gap-2">
+            <div className="text-xs">
+              <p className="font-medium flex items-center gap-1.5">
+                <Archive className="w-3.5 h-3.5" /> Produit archivé
+              </p>
+              <p className="text-muted-foreground">
+                {p.archive_motif ? MOTIF_ARCHIVAGE_LABEL[p.archive_motif] : "—"} · {dateFr(p.archived_at)}
+              </p>
+            </div>
+            <button
+              onClick={() => restaurerArchive(p.id).then(() => {
+                toast.success("Restauré.");
+                qc.invalidateQueries({ queryKey: ["produit", id] });
+                qc.invalidateQueries({ queryKey: ["produits"] });
+              }).catch((e) => toast.error(e instanceof Error ? e.message : "Erreur"))}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded border bg-background"
+            >
+              <RotateCcw className="w-3 h-3" /> Restaurer
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Photos */}
       <div className="bg-secondary/40">
@@ -287,8 +317,44 @@ function Fiche() {
           onSave={(v) => updateMut.mutate({ description: v })} />
         <TextAreaField label="Notes" editing={editing} value={p.notes}
           onSave={(v) => updateMut.mutate({ notes: v })} />
+
+        <SectionTitle>Historique</SectionTitle>
+        <HistoriqueProduit produitId={id} />
       </div>
     </div>
+  );
+}
+
+function HistoriqueProduit({ produitId }: { produitId: string }) {
+  const q = useQuery({
+    queryKey: ["historique", produitId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("produit_historique" as never)
+        .select("id, action, acteur_email, created_at, details")
+        .eq("produit_id", produitId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as unknown as Array<{
+        id: string; action: string; acteur_email: string | null; created_at: string; details: Record<string, unknown> | null;
+      }>;
+    },
+  });
+  const list = q.data ?? [];
+  if (list.length === 0) return <p className="text-xs text-muted-foreground italic">Aucune action enregistrée.</p>;
+  return (
+    <ul className="text-xs space-y-1">
+      {list.map((h) => (
+        <li key={h.id} className="flex justify-between gap-2 border-b py-1">
+          <span>
+            <span className="font-medium">{ACTION_HISTORIQUE_LABEL[h.action] ?? h.action}</span>
+            {h.acteur_email && <span className="text-muted-foreground"> · {h.acteur_email}</span>}
+          </span>
+          <span className="text-muted-foreground shrink-0">{dateFr(h.created_at)}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 

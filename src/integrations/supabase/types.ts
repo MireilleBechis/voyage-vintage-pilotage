@@ -14,10 +14,49 @@ export type Database = {
   }
   public: {
     Tables: {
+      produit_historique: {
+        Row: {
+          acteur_email: string | null
+          acteur_id: string | null
+          action: Database["public"]["Enums"]["action_historique"]
+          created_at: string
+          details: Json | null
+          id: string
+          identifiant: string
+          owner_id: string
+          produit_id: string | null
+        }
+        Insert: {
+          acteur_email?: string | null
+          acteur_id?: string | null
+          action: Database["public"]["Enums"]["action_historique"]
+          created_at?: string
+          details?: Json | null
+          id?: string
+          identifiant: string
+          owner_id: string
+          produit_id?: string | null
+        }
+        Update: {
+          acteur_email?: string | null
+          acteur_id?: string | null
+          action?: Database["public"]["Enums"]["action_historique"]
+          created_at?: string
+          details?: Json | null
+          id?: string
+          identifiant?: string
+          owner_id?: string
+          produit_id?: string | null
+        }
+        Relationships: []
+      }
       produits: {
         Row: {
           actions_requises: string[]
           annee: string | null
+          archive_motif: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at: string | null
+          archived_by: string | null
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
@@ -77,6 +116,8 @@ export type Database = {
           statut_modifie_manuellement: boolean
           statut_origine: Database["public"]["Enums"]["origine_statut"]
           titre_commercial: string | null
+          trashed_at: string | null
+          trashed_by: string | null
           type_objet: string | null
           updated_at: string
           woodcase: string | null
@@ -84,6 +125,9 @@ export type Database = {
         Insert: {
           actions_requises?: string[]
           annee?: string | null
+          archive_motif?: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at?: string | null
+          archived_by?: string | null
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
@@ -143,6 +187,8 @@ export type Database = {
           statut_modifie_manuellement?: boolean
           statut_origine?: Database["public"]["Enums"]["origine_statut"]
           titre_commercial?: string | null
+          trashed_at?: string | null
+          trashed_by?: string | null
           type_objet?: string | null
           updated_at?: string
           woodcase?: string | null
@@ -150,6 +196,9 @@ export type Database = {
         Update: {
           actions_requises?: string[]
           annee?: string | null
+          archive_motif?: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at?: string | null
+          archived_by?: string | null
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
@@ -209,6 +258,8 @@ export type Database = {
           statut_modifie_manuellement?: boolean
           statut_origine?: Database["public"]["Enums"]["origine_statut"]
           titre_commercial?: string | null
+          trashed_at?: string | null
+          trashed_by?: string | null
           type_objet?: string | null
           updated_at?: string
           woodcase?: string | null
@@ -295,6 +346,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -308,12 +380,28 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: Database["public"]["Enums"]["statut_produit"]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       marge_reelle: {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: number
       }
     }
     Enums: {
+      action_historique:
+        | "cree"
+        | "modifie"
+        | "archive"
+        | "restaure_archive"
+        | "corbeille"
+        | "restaure_corbeille"
+        | "supprime"
+      app_role: "admin" | "user"
       categorie_produit:
         | "enceintes"
         | "chaises"
@@ -329,6 +417,14 @@ export type Database = {
         | "necessaire"
         | "non_necessaire"
         | "terminee"
+      motif_archivage:
+        | "vendu_anterieurement"
+        | "retire_vente"
+        | "conservation_perso"
+        | "donne"
+        | "perdu_endommage"
+        | "erreur_saisie"
+        | "autre"
       origine_statut: "automatique" | "manuel"
       statut_produit:
         | "A_IDENTIFIER"
@@ -488,6 +584,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      action_historique: [
+        "cree",
+        "modifie",
+        "archive",
+        "restaure_archive",
+        "corbeille",
+        "restaure_corbeille",
+        "supprime",
+      ],
+      app_role: ["admin", "user"],
       categorie_produit: [
         "enceintes",
         "chaises",
@@ -504,6 +610,15 @@ export const Constants = {
         "necessaire",
         "non_necessaire",
         "terminee",
+      ],
+      motif_archivage: [
+        "vendu_anterieurement",
+        "retire_vente",
+        "conservation_perso",
+        "donne",
+        "perdu_endommage",
+        "erreur_saisie",
+        "autre",
       ],
       origine_statut: ["automatique", "manuel"],
       statut_produit: [

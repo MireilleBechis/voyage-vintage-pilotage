@@ -48,8 +48,11 @@ const ACTIONS_FILTRABLES: ActionRequise[] = [
   "dimensions_manquantes",
 ];
 
+type Audience = "actifs" | "archives" | "corbeille";
+
 function Stock() {
   const [view, setView] = useState<"list" | "cards">("list");
+  const [audience, setAudience] = useState<Audience>("actifs");
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("");
   const [stat, setStat] = useState<string>("");
@@ -57,9 +60,17 @@ function Stock() {
   const [tri, setTri] = useState<Tri>("identifiant");
 
   const produitsQ = useQuery({
-    queryKey: ["produits"],
+    queryKey: ["produits", audience],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").order("identifiant");
+      let query = supabase.from("produits").select("*").order("identifiant");
+      if (audience === "actifs") {
+        query = query.is("archived_at", null).is("trashed_at", null);
+      } else if (audience === "archives") {
+        query = query.not("archived_at", "is", null).is("trashed_at", null);
+      } else {
+        query = query.not("trashed_at", "is", null);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as unknown as Produit[];
     },
@@ -111,6 +122,14 @@ function Stock() {
             placeholder="Rechercher (marque, modèle, VV-…)"
             className="w-full pl-9 pr-3 py-2.5 rounded-md border bg-card text-sm"
           />
+        </div>
+        <div className="flex gap-1 rounded-md border bg-card p-0.5 text-xs">
+          {(["actifs","archives","corbeille"] as Audience[]).map((a) => (
+            <button key={a} onClick={() => setAudience(a)}
+              className={`px-2 py-1 rounded ${audience === a ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+              {a === "actifs" ? "Actifs" : a === "archives" ? "Archivés" : "Corbeille"}
+            </button>
+          ))}
         </div>
         <div className="flex gap-2 overflow-x-auto">
           <select value={cat} onChange={(e) => setCat(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
