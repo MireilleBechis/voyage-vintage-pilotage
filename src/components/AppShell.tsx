@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto max-w-md space-y-1">
-              {MORE.map((it) => (
+              {items.map((it) => (
                 <Link
                   key={it.to} to={it.to}
                   onClick={() => setOpenMore(false)}
