@@ -29,7 +29,7 @@ export const importInitialStock = createServerFn({ method: "POST" })
     let inserted = 0;
     for (let i = 0; i < toInsert.length; i += 50) {
       const chunk = toInsert.slice(i, i + 50);
-      const { error, count } = await supabase.from("produits").insert(chunk, { count: "exact" });
+      const { error, count } = await supabase.from("produits").insert(chunk as never, { count: "exact" });
       if (error) throw new Error(`Import échoué à la ligne ${i}: ${error.message}`);
       inserted += count ?? chunk.length;
     }
