@@ -107,7 +107,7 @@ function UserCard({ u, onChanged }: { u: UserRow; onChanged: () => void }) {
   const roleFn = useServerFn(setRole);
   const permsFn = useServerFn(setPermissions);
   const suspFn = useServerFn(setSuspension);
-  const currentRole: AppRole = u.roles[0] ?? "user";
+  const currentRole: AppRole = (u.roles[0] as AppRole | undefined) ?? "collaborateur";
   const [busy, setBusy] = useState(false);
 
   async function changeRole(role: AppRole) {
