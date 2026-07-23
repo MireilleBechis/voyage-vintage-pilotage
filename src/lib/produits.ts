@@ -72,6 +72,7 @@ export const CAT_LABEL: Record<Categorie, string> = {
 const PARCOURS: Statut[] = [
   "A_IDENTIFIER",
   "A_EXPERTISER",
+  "ETAT_A_VERIFIER",
   "A_NETTOYER",
   "A_RESTAURER",
   "A_PHOTOGRAPHIER",
