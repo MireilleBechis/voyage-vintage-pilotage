@@ -278,11 +278,97 @@ function Fiche() {
             onSave={(v) => updateMut.mutate({ date_achat: v as string })} display={dateFr(p.date_achat)} />
         </Grid>
 
+        <SectionTitle>Tâches</SectionTitle>
+        <TachesProduit produitId={id} />
+
         <SectionTitle>Description & notes</SectionTitle>
         <TextAreaField label="Description" editing={editing} value={p.description}
           onSave={(v) => updateMut.mutate({ description: v })} />
         <TextAreaField label="Notes" editing={editing} value={p.notes}
           onSave={(v) => updateMut.mutate({ notes: v })} />
+      </div>
+    </div>
+  );
+}
+
+function TachesProduit({ produitId }: { produitId: string }) {
+  const qc = useQueryClient();
+  const [titre, setTitre] = useState("");
+  const [type, setType] = useState<TypeAction>("autre");
+
+  const q = useQuery({
+    queryKey: ["taches", produitId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("taches").select("*")
+        .eq("produit_id", produitId)
+        .order("statut", { ascending: true })
+        .order("priorite", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as unknown as Array<{
+        id: string; titre: string; type_action: TypeAction; statut: "a_faire" | "en_cours" | "fait" | "annule"; priorite: number;
+      }>;
+    },
+  });
+
+  const addMut = useMutation({
+    mutationFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const { error } = await supabase.from("taches").insert({
+        owner_id: userData.user!.id, produit_id: produitId, titre: titre.trim(), type_action: type,
+      } as never);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setTitre("");
+      toast.success("Tâche ajoutée.");
+      qc.invalidateQueries({ queryKey: ["taches", produitId] });
+      qc.invalidateQueries({ queryKey: ["taches"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Erreur"),
+  });
+
+  const toggleMut = useMutation({
+    mutationFn: async ({ id, done }: { id: string; done: boolean }) => {
+      const { error } = await supabase.from("taches").update({
+        statut: done ? "fait" : "a_faire",
+        date_completion: done ? new Date().toISOString() : null,
+      } as never).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["taches", produitId] });
+      qc.invalidateQueries({ queryKey: ["taches"] });
+    },
+  });
+
+  const list = q.data ?? [];
+  return (
+    <div className="space-y-2">
+      {list.length === 0 && <p className="text-xs text-muted-foreground italic">Aucune tâche.</p>}
+      {list.map((t) => (
+        <div key={t.id} className="flex items-center gap-2 text-sm">
+          <button onClick={() => toggleMut.mutate({ id: t.id, done: t.statut !== "fait" })}
+            className="text-primary shrink-0">
+            {t.statut === "fait" ? <CheckCircle2 className="w-4 h-4" /> : <span className="w-4 h-4 border rounded-full inline-block" />}
+          </button>
+          <span className="text-[10px] uppercase tracking-widest text-brass">{ACTION_LABEL[t.type_action]}</span>
+          <span className={t.statut === "fait" ? "line-through text-muted-foreground" : ""}>{t.titre}</span>
+        </div>
+      ))}
+      <div className="flex gap-2 pt-2">
+        <select value={type} onChange={(e) => setType(e.target.value as TypeAction)}
+          className="rounded-md border bg-card px-2 py-1.5 text-sm">
+          {(Object.keys(ACTION_LABEL) as TypeAction[]).map((a) => (
+            <option key={a} value={a}>{ACTION_LABEL[a]}</option>
+          ))}
+        </select>
+        <input value={titre} onChange={(e) => setTitre(e.target.value)}
+          placeholder="Nouvelle tâche…"
+          className="flex-1 rounded-md border bg-card px-2 py-1.5 text-sm" />
+        <button onClick={() => titre.trim() && addMut.mutate()} disabled={!titre.trim() || addMut.isPending}
+          className="rounded-md bg-primary text-primary-foreground px-3 text-sm disabled:opacity-60">
+          Ajouter
+        </button>
       </div>
     </div>
   );
