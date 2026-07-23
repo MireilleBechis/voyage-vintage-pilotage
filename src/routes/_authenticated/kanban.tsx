@@ -18,7 +18,7 @@ function Kanban() {
   const q = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").is("archived_at", null).is("trashed_at", null).order("created_at");
+      const { data, error } = await supabase.from("produits_interne").select("*").is("archived_at", null).is("trashed_at", null).order("created_at");
       if (error) throw error;
       return (data ?? []) as unknown as Produit[];
     },

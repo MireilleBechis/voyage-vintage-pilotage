@@ -60,7 +60,7 @@ function Taches() {
   const produitsQ = useQuery({
     queryKey: ["produits"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("id, identifiant, designer_ou_marque, modele").is("trashed_at", null);
+      const { data, error } = await supabase.from("produits_interne").select("id, identifiant, designer_ou_marque, modele").is("trashed_at", null);
       if (error) throw error;
       return (data ?? []) as unknown as Pick<Produit, "id" | "identifiant" | "designer_ou_marque" | "modele">[];
     },
