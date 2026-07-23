@@ -304,7 +304,7 @@ function InviteDialog({ onCreated }: { onCreated: () => void }) {
             <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {ROLES.filter((r) => r !== "user").map((r) => (
+                {ROLES.map((r) => (
                   <SelectItem key={r} value={r}>{ROLE_LABEL[r]}</SelectItem>
                 ))}
               </SelectContent>
