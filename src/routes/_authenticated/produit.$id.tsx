@@ -317,8 +317,44 @@ function Fiche() {
           onSave={(v) => updateMut.mutate({ description: v })} />
         <TextAreaField label="Notes" editing={editing} value={p.notes}
           onSave={(v) => updateMut.mutate({ notes: v })} />
+
+        <SectionTitle>Historique</SectionTitle>
+        <HistoriqueProduit produitId={id} />
       </div>
     </div>
+  );
+}
+
+function HistoriqueProduit({ produitId }: { produitId: string }) {
+  const q = useQuery({
+    queryKey: ["historique", produitId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("produit_historique" as never)
+        .select("id, action, acteur_email, created_at, details")
+        .eq("produit_id", produitId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as unknown as Array<{
+        id: string; action: string; acteur_email: string | null; created_at: string; details: Record<string, unknown> | null;
+      }>;
+    },
+  });
+  const list = q.data ?? [];
+  if (list.length === 0) return <p className="text-xs text-muted-foreground italic">Aucune action enregistrée.</p>;
+  return (
+    <ul className="text-xs space-y-1">
+      {list.map((h) => (
+        <li key={h.id} className="flex justify-between gap-2 border-b py-1">
+          <span>
+            <span className="font-medium">{ACTION_HISTORIQUE_LABEL[h.action] ?? h.action}</span>
+            {h.acteur_email && <span className="text-muted-foreground"> · {h.acteur_email}</span>}
+          </span>
+          <span className="text-muted-foreground shrink-0">{dateFr(h.created_at)}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
