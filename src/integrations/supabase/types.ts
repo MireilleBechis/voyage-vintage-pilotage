@@ -459,6 +459,13 @@ export type Database = {
             foreignKeyName: "taches_produit_id_fkey"
             columns: ["produit_id"]
             isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
             referencedRelation: "produits_public"
             referencedColumns: ["id"]
           },
@@ -538,6 +545,264 @@ export type Database = {
       }
     }
     Views: {
+      produits_interne: {
+        Row: {
+          actions_requises: string[] | null
+          annee: string | null
+          archive_motif: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at: string | null
+          archived_by: string | null
+          blocage: string | null
+          cabinet: string | null
+          canal_achat: string | null
+          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          coque_assise: string | null
+          couleur: string | null
+          cout_total: number | null
+          cout_transport: number | null
+          cout_travaux: number | null
+          created_at: string | null
+          date_achat: string | null
+          date_limite: string | null
+          date_vente: string | null
+          description: string | null
+          designer_ou_marque: string | null
+          dimensions: string | null
+          disponibilite:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          documents_authenticite: Json | null
+          donnees_douteuses: Json | null
+          doublon_groupe: string | null
+          doublon_valide: boolean | null
+          editeur_ou_label: string | null
+          emplacement_stockage: string | null
+          etat: string | null
+          forme: string | null
+          frequence: string | null
+          id: string | null
+          identifiant: string | null
+          impedance: string | null
+          import_original: Json | null
+          liens_annonces: Json | null
+          marge_potentielle: number | null
+          materiaux: string | null
+          modele: string | null
+          nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
+          niveau_effort: number | null
+          notes: string | null
+          owner_id: string | null
+          photos: Json | null
+          pied: string | null
+          plateformes_publication: string[] | null
+          poids: string | null
+          prix_achat: number | null
+          prix_minimum_accepte: number | null
+          prix_minimum_interne: number | null
+          prix_pro_ht: number | null
+          prix_public_ttc: number | null
+          prix_vente_cible: number | null
+          prix_vente_reel: number | null
+          prochaine_action: string | null
+          puissance: string | null
+          remise_pro_pct: number | null
+          restauration: Database["public"]["Enums"]["etat_restauration"] | null
+          revetement: string | null
+          sensibilite: string | null
+          shopify_product_id: string | null
+          source_feuille: string | null
+          source_ligne: number | null
+          sous_categorie: string | null
+          statut: Database["public"]["Enums"]["statut_produit"] | null
+          statut_calcule_le: string | null
+          statut_modifie_manuellement: boolean | null
+          statut_origine: Database["public"]["Enums"]["origine_statut"] | null
+          tarif_pro_valide_jusqu: string | null
+          titre_commercial: string | null
+          trashed_at: string | null
+          trashed_by: string | null
+          tva_regime: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux: number | null
+          type_objet: string | null
+          updated_at: string | null
+          validation_statut:
+            | Database["public"]["Enums"]["validation_statut"]
+            | null
+          visibilite: Database["public"]["Enums"]["produit_visibilite"] | null
+          woodcase: string | null
+        }
+        Insert: {
+          actions_requises?: string[] | null
+          annee?: string | null
+          archive_motif?: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at?: string | null
+          archived_by?: string | null
+          blocage?: string | null
+          cabinet?: string | null
+          canal_achat?: string | null
+          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          coque_assise?: string | null
+          couleur?: string | null
+          cout_total?: never
+          cout_transport?: never
+          cout_travaux?: never
+          created_at?: string | null
+          date_achat?: string | null
+          date_limite?: string | null
+          date_vente?: string | null
+          description?: string | null
+          designer_ou_marque?: string | null
+          dimensions?: string | null
+          disponibilite?:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          documents_authenticite?: Json | null
+          donnees_douteuses?: Json | null
+          doublon_groupe?: string | null
+          doublon_valide?: boolean | null
+          editeur_ou_label?: string | null
+          emplacement_stockage?: string | null
+          etat?: string | null
+          forme?: string | null
+          frequence?: string | null
+          id?: string | null
+          identifiant?: string | null
+          impedance?: string | null
+          import_original?: Json | null
+          liens_annonces?: Json | null
+          marge_potentielle?: never
+          materiaux?: string | null
+          modele?: string | null
+          nettoyage?: Database["public"]["Enums"]["etat_nettoyage"] | null
+          niveau_effort?: number | null
+          notes?: string | null
+          owner_id?: string | null
+          photos?: Json | null
+          pied?: string | null
+          plateformes_publication?: string[] | null
+          poids?: string | null
+          prix_achat?: never
+          prix_minimum_accepte?: never
+          prix_minimum_interne?: never
+          prix_pro_ht?: never
+          prix_public_ttc?: number | null
+          prix_vente_cible?: number | null
+          prix_vente_reel?: number | null
+          prochaine_action?: string | null
+          puissance?: string | null
+          remise_pro_pct?: never
+          restauration?: Database["public"]["Enums"]["etat_restauration"] | null
+          revetement?: string | null
+          sensibilite?: string | null
+          shopify_product_id?: string | null
+          source_feuille?: string | null
+          source_ligne?: number | null
+          sous_categorie?: string | null
+          statut?: Database["public"]["Enums"]["statut_produit"] | null
+          statut_calcule_le?: string | null
+          statut_modifie_manuellement?: boolean | null
+          statut_origine?: Database["public"]["Enums"]["origine_statut"] | null
+          tarif_pro_valide_jusqu?: string | null
+          titre_commercial?: string | null
+          trashed_at?: string | null
+          trashed_by?: string | null
+          tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux?: number | null
+          type_objet?: string | null
+          updated_at?: string | null
+          validation_statut?:
+            | Database["public"]["Enums"]["validation_statut"]
+            | null
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
+          woodcase?: string | null
+        }
+        Update: {
+          actions_requises?: string[] | null
+          annee?: string | null
+          archive_motif?: Database["public"]["Enums"]["motif_archivage"] | null
+          archived_at?: string | null
+          archived_by?: string | null
+          blocage?: string | null
+          cabinet?: string | null
+          canal_achat?: string | null
+          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          coque_assise?: string | null
+          couleur?: string | null
+          cout_total?: never
+          cout_transport?: never
+          cout_travaux?: never
+          created_at?: string | null
+          date_achat?: string | null
+          date_limite?: string | null
+          date_vente?: string | null
+          description?: string | null
+          designer_ou_marque?: string | null
+          dimensions?: string | null
+          disponibilite?:
+            | Database["public"]["Enums"]["produit_disponibilite"]
+            | null
+          documents_authenticite?: Json | null
+          donnees_douteuses?: Json | null
+          doublon_groupe?: string | null
+          doublon_valide?: boolean | null
+          editeur_ou_label?: string | null
+          emplacement_stockage?: string | null
+          etat?: string | null
+          forme?: string | null
+          frequence?: string | null
+          id?: string | null
+          identifiant?: string | null
+          impedance?: string | null
+          import_original?: Json | null
+          liens_annonces?: Json | null
+          marge_potentielle?: never
+          materiaux?: string | null
+          modele?: string | null
+          nettoyage?: Database["public"]["Enums"]["etat_nettoyage"] | null
+          niveau_effort?: number | null
+          notes?: string | null
+          owner_id?: string | null
+          photos?: Json | null
+          pied?: string | null
+          plateformes_publication?: string[] | null
+          poids?: string | null
+          prix_achat?: never
+          prix_minimum_accepte?: never
+          prix_minimum_interne?: never
+          prix_pro_ht?: never
+          prix_public_ttc?: number | null
+          prix_vente_cible?: number | null
+          prix_vente_reel?: number | null
+          prochaine_action?: string | null
+          puissance?: string | null
+          remise_pro_pct?: never
+          restauration?: Database["public"]["Enums"]["etat_restauration"] | null
+          revetement?: string | null
+          sensibilite?: string | null
+          shopify_product_id?: string | null
+          source_feuille?: string | null
+          source_ligne?: number | null
+          sous_categorie?: string | null
+          statut?: Database["public"]["Enums"]["statut_produit"] | null
+          statut_calcule_le?: string | null
+          statut_modifie_manuellement?: boolean | null
+          statut_origine?: Database["public"]["Enums"]["origine_statut"] | null
+          tarif_pro_valide_jusqu?: string | null
+          titre_commercial?: string | null
+          trashed_at?: string | null
+          trashed_by?: string | null
+          tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
+          tva_taux?: number | null
+          type_objet?: string | null
+          updated_at?: string | null
+          validation_statut?:
+            | Database["public"]["Enums"]["validation_statut"]
+            | null
+          visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
+          woodcase?: string | null
+        }
+        Relationships: []
+      }
       produits_public: {
         Row: {
           annee: string | null
@@ -632,6 +897,7 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: Database["public"]["Enums"]["statut_produit"]
       }
+      can_view_finances: { Args: { _uid: string }; Returns: boolean }
       has_permission: {
         Args: {
           _perm: Database["public"]["Enums"]["role_permission"]
