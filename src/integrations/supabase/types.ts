@@ -300,6 +300,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculer_actions_requises: {
+        Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
+        Returns: string[]
+      }
+      calculer_statut_produit: {
+        Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
+        Returns: Database["public"]["Enums"]["statut_produit"]
+      }
       marge_reelle: {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: number
