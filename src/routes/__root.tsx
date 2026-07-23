@@ -95,8 +95,12 @@ function RootComponent() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      // Repoussé pour ne jamais planifier de mise à jour d'état pendant le render en cours
+      // d'un autre composant (déclenchement possible synchrone au montage).
+      queueMicrotask(() => {
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      });
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
