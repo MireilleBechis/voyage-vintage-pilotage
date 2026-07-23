@@ -28,18 +28,28 @@ export const Route = createFileRoute("/_authenticated/produit/$id")({
 function Fiche() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const router = useRouter();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const retour = useCallback(() => {
+    // Préserve la recherche/filtres/tri/scroll de la liste précédente.
+    const canGoBack = typeof window !== "undefined" && window.history.length > 1;
+    if (canGoBack) router.history.back();
+    else navigate({ to: "/stock" });
+  }, [navigate, router]);
+
   const q = useQuery({
     queryKey: ["produit", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("produits").select("*").eq("id", id).single();
+      const { data, error } = await supabase.from("produits").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
-      return data as unknown as Produit;
+      return (data as unknown as Produit) ?? null;
     },
+    retry: false,
   });
+
 
   const updateMut = useMutation({
     mutationFn: async (patch: Partial<Produit>) => {
