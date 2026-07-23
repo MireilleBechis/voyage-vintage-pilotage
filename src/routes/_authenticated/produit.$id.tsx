@@ -37,6 +37,7 @@ function Fiche() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const role = useRole();
 
   const retour = useCallback(() => {
     // Préserve la recherche/filtres/tri/scroll de la liste précédente.
