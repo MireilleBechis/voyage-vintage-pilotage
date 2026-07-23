@@ -6,11 +6,13 @@ import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
   STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
-  ACTION_LABEL, type TypeAction,
+  ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
 } from "@/lib/produits";
 import { eur, dateFr, anciennete } from "@/lib/format";
-import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock } from "lucide-react";
+import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { ProduitMenu } from "@/components/ProduitMenu";
+import { restaurerArchive } from "@/lib/produit-actions";
 
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   head: () => ({
