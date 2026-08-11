@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getProduitInterne, updateProduit } from "@/lib/produits-api";
 import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
-  STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
+  STATUT_COULEUR, ETATS_NETTOYAGE, ETATS_RESTAURATION, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
   ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
   VISIBILITES, VISIBILITE_LABEL, type Visibilite,
@@ -277,11 +277,13 @@ function Fiche() {
           <EtatSelect
             label="Nettoyage"
             value={p.nettoyage}
+            options={ETATS_NETTOYAGE}
             onSave={(v) => updateMut.mutate({ nettoyage: v })}
           />
           <EtatSelect
             label="Restauration"
             value={p.restauration}
+            options={ETATS_RESTAURATION}
             onSave={(v) => updateMut.mutate({ restauration: v })}
           />
         </Grid>
@@ -407,7 +409,7 @@ function HistoriqueProduit({ produitId }: { produitId: string }) {
     queryKey: ["historique", produitId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("produit_historique" as never)
+        .from("produit_historique")
         .select("id, produit_id, identifiant, action, acteur_email, created_at, details")
         .eq("produit_id", produitId)
         .order("created_at", { ascending: false })
@@ -539,18 +541,18 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
 
-function EtatSelect({ label, value, onSave }: {
-  label: string; value: EtatTravaux; onSave: (v: EtatTravaux) => void;
+function EtatSelect<T extends EtatTravaux>({ label, value, options, onSave }: {
+  label: string; value: T; options: readonly T[]; onSave: (v: T) => void;
 }) {
   return (
     <div>
       <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</label>
       <select
         value={value}
-        onChange={(e) => onSave(e.target.value as EtatTravaux)}
+        onChange={(e) => onSave(e.target.value as T)}
         className="mt-0.5 w-full rounded-md border bg-card px-2 py-1.5 text-sm"
       >
-        {ETATS_TRAVAUX.map((e) => <option key={e} value={e}>{ETAT_TRAVAUX_LABEL[e]}</option>)}
+        {options.map((e) => <option key={e} value={e}>{ETAT_TRAVAUX_LABEL[e]}</option>)}
       </select>
     </div>
   );

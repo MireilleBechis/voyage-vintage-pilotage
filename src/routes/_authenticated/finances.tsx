@@ -30,15 +30,23 @@ function Finances() {
   const enLigne = enStock.filter((p) => p.statut === "EN_LIGNE").length;
   const prets = enStock.filter((p) => p.statut === "PRET_A_PUBLIER").length;
 
+  // Les colonnes financières sont masquées (null) pour les profils sans permission.
+  const coutsMasques = enStock.length > 0 && enStock.every((p) => p.cout_total == null);
+  const margesMasquees = enStock.length > 0 && enStock.every((p) => p.marge_potentielle == null);
+
   const coutStock = sum(enStock.map((p) => p.cout_total));
   const ventesPot = sum(enStock.map((p) => p.prix_vente_cible));
   const margePot = sum(enStock.map((p) => p.marge_potentielle));
   const ventesReal = sum(vendus.map((p) => p.prix_vente_reel));
   const margeReal = sum(vendus.map((p) => margeReelle(p) ?? 0));
-  const immobilise = coutStock - sum(vendus.map((p) => p.prix_vente_reel));
-  const rotation = enStock.length > 0 && coutStock > 0
+  // Capital immobilisé = coût total des produits encore en stock (les ventes
+  // réalisées ne sont, par définition, plus dans le stock).
+  const immobilise = coutStock;
+  const rotation = !coutsMasques && !margesMasquees && enStock.length > 0 && coutStock > 0
     ? Math.round((margePot / coutStock) * 100)
-    : 0;
+    : null;
+
+  const montant = (v: number, masque: boolean) => (masque ? "—" : eur(v));
 
   const parCat = groupBy(enStock, (p) => p.categorie);
   const parStatut = groupBy(enStock, (p) => p.statut);
@@ -71,17 +79,16 @@ function Finances() {
       </header>
 
       <div className="grid grid-cols-2 gap-3">
-        <KPI label="Coût du stock" value={eur(coutStock)} accent />
-        <KPI label="Argent immobilisé" value={eur(immobilise)} />
+        <KPI label="Capital immobilisé" value={montant(immobilise, coutsMasques)} accent />
         <KPI label="Ventes potentielles" value={eur(ventesPot)} />
-        <KPI label="Marge potentielle" value={eur(margePot)} />
+        <KPI label="Marge potentielle" value={montant(margePot, margesMasquees)} />
         <KPI label="Ventes réalisées" value={eur(ventesReal)} />
-        <KPI label="Marge réelle" value={eur(margeReal)} />
+        <KPI label="Marge réelle" value={montant(margeReal, margesMasquees)} />
       </div>
 
       <div className="rounded-xl border bg-card p-3">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Rotation potentielle</p>
-        <p className="font-serif text-2xl mt-1">{rotation}%</p>
+        <p className="font-serif text-2xl mt-1">{rotation === null ? "—" : `${rotation}%`}</p>
         <p className="text-[11px] text-muted-foreground mt-1">Marge potentielle rapportée au coût du stock.</p>
       </div>
 
@@ -96,6 +103,7 @@ function Finances() {
             colorClass: STATUT_COULEUR[s as Statut] ?? "bg-secondary",
           }))}
           total={enStock.length}
+          masked={coutsMasques}
         />
       </section>
 
@@ -110,6 +118,7 @@ function Finances() {
             colorClass: "bg-primary/70 text-primary-foreground border-primary/40",
           }))}
           total={enStock.length}
+          masked={coutsMasques}
         />
       </section>
 
@@ -122,7 +131,7 @@ function Finances() {
               <div key={k}>
                 <div className="flex items-center justify-between text-xs mb-0.5">
                   <span>{k === "180+" ? "Plus de 180 jours" : `${k} jours`} <span className="text-muted-foreground">· {buckets[k]}</span></span>
-                  <span className="text-muted-foreground">{eur(bucketsCapital[k])}</span>
+                  <span className="text-muted-foreground">{montant(bucketsCapital[k], coutsMasques)}</span>
                 </div>
                 <div className="h-2 rounded-full bg-secondary overflow-hidden">
                   <div
@@ -150,7 +159,7 @@ function Finances() {
                 <span className="text-brass text-xs mr-1.5">{p.identifiant}</span>
                 {p.titre_commercial ?? (`${p.designer_ou_marque ?? ""} ${p.modele ?? ""}`.trim() || "Sans titre")}
               </span>
-              <span className="text-xs text-muted-foreground shrink-0">{eur(p.cout_total)}</span>
+              <span className="text-xs text-muted-foreground shrink-0">{montant(Number(p.cout_total ?? 0), coutsMasques)}</span>
             </Link>
           ))}
           {topImmobilise.length === 0 && (
@@ -174,9 +183,11 @@ function KPI({ label, value, accent }: { label: string; value: string; accent?: 
 function BarList({
   items,
   total,
+  masked,
 }: {
   items: Array<{ key: string; label: string; count: number; value: number; colorClass: string }>;
   total: number;
+  masked?: boolean;
 }) {
   const sorted = [...items].sort((a, b) => b.count - a.count);
   return (
@@ -187,7 +198,7 @@ function BarList({
           <div key={it.key}>
             <div className="flex items-center justify-between text-xs mb-0.5">
               <span>{it.label} <span className="text-muted-foreground">· {it.count}</span></span>
-              <span className="text-muted-foreground">{eur(it.value)}</span>
+              <span className="text-muted-foreground">{masked ? "—" : eur(it.value)}</span>
             </div>
             <div className="h-2 rounded-full bg-secondary overflow-hidden">
               <div className={it.colorClass.split(" ")[0]} style={{ width: `${pct}%`, height: "100%" }} />

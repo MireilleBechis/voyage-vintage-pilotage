@@ -6,13 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Produit, MotifArchivage } from "./produits";
 
 export async function listProduitsInterne(): Promise<Produit[]> {
-  const { data, error } = await supabase.rpc("list_produits_interne" as never);
+  const { data, error } = await supabase.rpc("list_produits_interne");
   if (error) throw error;
   return ((data ?? []) as unknown) as Produit[];
 }
 
 export async function getProduitInterne(id: string): Promise<Produit | null> {
-  const { data, error } = await supabase.rpc("get_produit_interne" as never, { _id: id } as never);
+  const { data, error } = await supabase.rpc("get_produit_interne", { _id: id });
   if (error) throw error;
   if (!data) return null;
   // La fonction retourne un ROW ; Supabase RPC renvoie soit l'objet soit un array selon typage
@@ -38,26 +38,26 @@ export async function createProduit(data: Record<string, unknown>): Promise<stri
 }
 
 export async function archiveProduitRpc(id: string, motif: MotifArchivage): Promise<void> {
-  const { error } = await supabase.rpc("archive_produit" as never, { _id: id, _motif: motif } as never);
+  const { error } = await supabase.rpc("archive_produit", { _id: id, _motif: motif });
   if (error) throw error;
 }
 
 export async function restoreFromArchiveRpc(id: string): Promise<void> {
-  const { error } = await supabase.rpc("restore_produit_from_archive" as never, { _id: id } as never);
+  const { error } = await supabase.rpc("restore_produit_from_archive", { _id: id });
   if (error) throw error;
 }
 
 export async function trashProduitRpc(id: string): Promise<void> {
-  const { error } = await supabase.rpc("trash_produit" as never, { _id: id } as never);
+  const { error } = await supabase.rpc("trash_produit", { _id: id });
   if (error) throw error;
 }
 
 export async function restoreFromTrashRpc(id: string): Promise<void> {
-  const { error } = await supabase.rpc("restore_produit_from_trash" as never, { _id: id } as never);
+  const { error } = await supabase.rpc("restore_produit_from_trash", { _id: id });
   if (error) throw error;
 }
 
 export async function deleteProduitRpc(id: string): Promise<void> {
-  const { error } = await supabase.rpc("delete_produit_definitivement" as never, { _id: id } as never);
+  const { error } = await supabase.rpc("delete_produit_definitivement", { _id: id });
   if (error) throw error;
 }

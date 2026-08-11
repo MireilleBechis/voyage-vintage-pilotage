@@ -87,16 +87,25 @@ export function statutSuivant(s: Statut): Statut | null {
   return PARCOURS[i + 1];
 }
 
-export type TypeAction =
-  | "nettoyage"
-  | "restauration"
-  | "photo"
-  | "redaction"
-  | "publication"
-  | "livraison"
-  | "expertise"
-  | "identification"
-  | "autre";
+export const TYPES_ACTION = [
+  "nettoyage",
+  "restauration",
+  "photo",
+  "redaction",
+  "publication",
+  "livraison",
+  "expertise",
+  "identification",
+  "expertiser_prix",
+  "verifier_etat",
+  "verifier_authenticite",
+  "mesurer",
+  "tester",
+  "emballer",
+  "relancer",
+  "autre",
+] as const;
+export type TypeAction = (typeof TYPES_ACTION)[number];
 
 export const ACTION_LABEL: Record<TypeAction, string> = {
   nettoyage: "Nettoyage",
@@ -107,8 +116,16 @@ export const ACTION_LABEL: Record<TypeAction, string> = {
   livraison: "Livraison",
   expertise: "Expertise",
   identification: "Identification",
+  expertiser_prix: "Expertiser le prix",
+  verifier_etat: "Vérifier l'état",
+  verifier_authenticite: "Vérifier l'authenticité",
+  mesurer: "Mesurer",
+  tester: "Tester",
+  emballer: "Emballer",
+  relancer: "Relancer",
   autre: "Autre",
 };
+
 
 export function actionParStatut(s: Statut): TypeAction {
   switch (s) {
@@ -154,10 +171,10 @@ export interface Produit {
   date_vente: string | null;
   statut: Statut;
   statut_modifie_manuellement: boolean;
-  statut_origine: "automatique" | "manuel" | "import";
+  statut_origine: "automatique" | "manuel";
   statut_calcule_le: string | null;
-  nettoyage: EtatTravaux;
-  restauration: EtatTravaux;
+  nettoyage: EtatNettoyage;
+  restauration: EtatRestauration;
   actions_requises: ActionRequise[];
   titre_commercial: string | null;
   prochaine_action: string | null;
@@ -235,14 +252,22 @@ export const ACTION_HISTORIQUE_LABEL: Record<string, string> = {
   supprime: "Supprimé définitivement",
 };
 
-export const ETATS_TRAVAUX = ["a_verifier", "non_necessaire", "necessaire", "en_cours", "termine"] as const;
-export type EtatTravaux = (typeof ETATS_TRAVAUX)[number];
+// Enums réels en base : etat_nettoyage se termine par « termine »,
+// etat_restauration par « terminee ». Il n'y a pas de valeur « en_cours ».
+export const ETATS_NETTOYAGE = ["a_verifier", "non_necessaire", "necessaire", "termine"] as const;
+export type EtatNettoyage = (typeof ETATS_NETTOYAGE)[number];
+
+export const ETATS_RESTAURATION = ["a_verifier", "non_necessaire", "necessaire", "terminee"] as const;
+export type EtatRestauration = (typeof ETATS_RESTAURATION)[number];
+
+export type EtatTravaux = EtatNettoyage | EtatRestauration;
+
 export const ETAT_TRAVAUX_LABEL: Record<EtatTravaux, string> = {
   a_verifier: "À vérifier",
   non_necessaire: "Non nécessaire",
   necessaire: "Nécessaire",
-  en_cours: "En cours",
   termine: "Terminé",
+  terminee: "Terminée",
 };
 
 export type ActionRequise =
@@ -307,8 +332,14 @@ export const ROLE_LABEL: Record<AppRole, string> = {
 export const PERMISSIONS = [
   "voir_prix_achat",
   "voir_marges",
-  "modifier_prix",
+  "voir_couts",
+  "voir_prix_minimum",
   "voir_factures_achat",
+  "modifier_prix",
+  "modifier_prix_achat",
+  "modifier_prix_public",
+  "modifier_prix_pro",
+  "modifier_prix_minimum",
   "creer_produit",
   "modifier_produit",
   "archiver_produit",
@@ -318,8 +349,14 @@ export type Permission = (typeof PERMISSIONS)[number];
 export const PERMISSION_LABEL: Record<Permission, string> = {
   voir_prix_achat: "Voir les prix d'achat",
   voir_marges: "Voir les marges",
-  modifier_prix: "Modifier les prix",
+  voir_couts: "Voir les coûts (travaux, transport, total)",
+  voir_prix_minimum: "Voir les prix minimum",
   voir_factures_achat: "Voir les factures d'achat",
+  modifier_prix: "Modifier tous les prix",
+  modifier_prix_achat: "Modifier les prix d'achat et coûts",
+  modifier_prix_public: "Modifier le prix public TTC",
+  modifier_prix_pro: "Modifier les prix professionnels",
+  modifier_prix_minimum: "Modifier les prix minimum",
   creer_produit: "Créer un produit",
   modifier_produit: "Modifier un produit",
   archiver_produit: "Archiver un produit",
