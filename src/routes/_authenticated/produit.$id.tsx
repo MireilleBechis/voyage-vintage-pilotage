@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getProduitInterne, updateProduit } from "@/lib/produits-api";
 import {
   STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
-  STATUT_COULEUR, ETATS_TRAVAUX, ETAT_TRAVAUX_LABEL, type EtatTravaux,
+  STATUT_COULEUR, ETATS_NETTOYAGE, ETATS_RESTAURATION, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
   ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
   VISIBILITES, VISIBILITE_LABEL, type Visibilite,
