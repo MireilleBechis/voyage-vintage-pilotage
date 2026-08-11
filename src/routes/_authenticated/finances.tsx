@@ -79,17 +79,16 @@ function Finances() {
       </header>
 
       <div className="grid grid-cols-2 gap-3">
-        <KPI label="Coût du stock" value={eur(coutStock)} accent />
-        <KPI label="Argent immobilisé" value={eur(immobilise)} />
+        <KPI label="Capital immobilisé" value={montant(immobilise, coutsMasques)} accent />
         <KPI label="Ventes potentielles" value={eur(ventesPot)} />
-        <KPI label="Marge potentielle" value={eur(margePot)} />
+        <KPI label="Marge potentielle" value={montant(margePot, margesMasquees)} />
         <KPI label="Ventes réalisées" value={eur(ventesReal)} />
-        <KPI label="Marge réelle" value={eur(margeReal)} />
+        <KPI label="Marge réelle" value={montant(margeReal, margesMasquees)} />
       </div>
 
       <div className="rounded-xl border bg-card p-3">
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Rotation potentielle</p>
-        <p className="font-serif text-2xl mt-1">{rotation}%</p>
+        <p className="font-serif text-2xl mt-1">{rotation === null ? "—" : `${rotation}%`}</p>
         <p className="text-[11px] text-muted-foreground mt-1">Marge potentielle rapportée au coût du stock.</p>
       </div>
 
