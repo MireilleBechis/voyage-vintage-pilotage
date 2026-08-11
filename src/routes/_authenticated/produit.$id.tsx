@@ -277,11 +277,13 @@ function Fiche() {
           <EtatSelect
             label="Nettoyage"
             value={p.nettoyage}
+            options={ETATS_NETTOYAGE}
             onSave={(v) => updateMut.mutate({ nettoyage: v })}
           />
           <EtatSelect
             label="Restauration"
             value={p.restauration}
+            options={ETATS_RESTAURATION}
             onSave={(v) => updateMut.mutate({ restauration: v })}
           />
         </Grid>
