@@ -129,7 +129,7 @@ function Finances() {
               <div key={k}>
                 <div className="flex items-center justify-between text-xs mb-0.5">
                   <span>{k === "180+" ? "Plus de 180 jours" : `${k} jours`} <span className="text-muted-foreground">· {buckets[k]}</span></span>
-                  <span className="text-muted-foreground">{eur(bucketsCapital[k])}</span>
+                  <span className="text-muted-foreground">{montant(bucketsCapital[k], coutsMasques)}</span>
                 </div>
                 <div className="h-2 rounded-full bg-secondary overflow-hidden">
                   <div
