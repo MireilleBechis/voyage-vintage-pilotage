@@ -103,6 +103,7 @@ function Finances() {
             colorClass: STATUT_COULEUR[s as Statut] ?? "bg-secondary",
           }))}
           total={enStock.length}
+          masked={coutsMasques}
         />
       </section>
 
