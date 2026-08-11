@@ -181,9 +181,11 @@ function KPI({ label, value, accent }: { label: string; value: string; accent?: 
 function BarList({
   items,
   total,
+  masked,
 }: {
   items: Array<{ key: string; label: string; count: number; value: number; colorClass: string }>;
   total: number;
+  masked?: boolean;
 }) {
   const sorted = [...items].sort((a, b) => b.count - a.count);
   return (
@@ -194,7 +196,7 @@ function BarList({
           <div key={it.key}>
             <div className="flex items-center justify-between text-xs mb-0.5">
               <span>{it.label} <span className="text-muted-foreground">· {it.count}</span></span>
-              <span className="text-muted-foreground">{eur(it.value)}</span>
+              <span className="text-muted-foreground">{masked ? "—" : eur(it.value)}</span>
             </div>
             <div className="h-2 rounded-full bg-secondary overflow-hidden">
               <div className={it.colorClass.split(" ")[0]} style={{ width: `${pct}%`, height: "100%" }} />
