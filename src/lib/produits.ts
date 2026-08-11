@@ -171,10 +171,10 @@ export interface Produit {
   date_vente: string | null;
   statut: Statut;
   statut_modifie_manuellement: boolean;
-  statut_origine: "automatique" | "manuel" | "import";
+  statut_origine: "automatique" | "manuel";
   statut_calcule_le: string | null;
-  nettoyage: EtatTravaux;
-  restauration: EtatTravaux;
+  nettoyage: EtatNettoyage;
+  restauration: EtatRestauration;
   actions_requises: ActionRequise[];
   titre_commercial: string | null;
   prochaine_action: string | null;
