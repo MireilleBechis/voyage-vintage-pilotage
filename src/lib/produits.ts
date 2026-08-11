@@ -87,16 +87,25 @@ export function statutSuivant(s: Statut): Statut | null {
   return PARCOURS[i + 1];
 }
 
-export type TypeAction =
-  | "nettoyage"
-  | "restauration"
-  | "photo"
-  | "redaction"
-  | "publication"
-  | "livraison"
-  | "expertise"
-  | "identification"
-  | "autre";
+export const TYPES_ACTION = [
+  "nettoyage",
+  "restauration",
+  "photo",
+  "redaction",
+  "publication",
+  "livraison",
+  "expertise",
+  "identification",
+  "expertiser_prix",
+  "verifier_etat",
+  "verifier_authenticite",
+  "mesurer",
+  "tester",
+  "emballer",
+  "relancer",
+  "autre",
+] as const;
+export type TypeAction = (typeof TYPES_ACTION)[number];
 
 export const ACTION_LABEL: Record<TypeAction, string> = {
   nettoyage: "Nettoyage",
@@ -107,8 +116,16 @@ export const ACTION_LABEL: Record<TypeAction, string> = {
   livraison: "Livraison",
   expertise: "Expertise",
   identification: "Identification",
+  expertiser_prix: "Expertiser le prix",
+  verifier_etat: "Vérifier l'état",
+  verifier_authenticite: "Vérifier l'authenticité",
+  mesurer: "Mesurer",
+  tester: "Tester",
+  emballer: "Emballer",
+  relancer: "Relancer",
   autre: "Autre",
 };
+
 
 export function actionParStatut(s: Statut): TypeAction {
   switch (s) {
