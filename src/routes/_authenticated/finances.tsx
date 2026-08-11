@@ -118,6 +118,7 @@ function Finances() {
             colorClass: "bg-primary/70 text-primary-foreground border-primary/40",
           }))}
           total={enStock.length}
+          masked={coutsMasques}
         />
       </section>
 
