@@ -157,7 +157,7 @@ function Finances() {
                 <span className="text-brass text-xs mr-1.5">{p.identifiant}</span>
                 {p.titre_commercial ?? (`${p.designer_ou_marque ?? ""} ${p.modele ?? ""}`.trim() || "Sans titre")}
               </span>
-              <span className="text-xs text-muted-foreground shrink-0">{eur(p.cout_total)}</span>
+              <span className="text-xs text-muted-foreground shrink-0">{montant(Number(p.cout_total ?? 0), coutsMasques)}</span>
             </Link>
           ))}
           {topImmobilise.length === 0 && (
