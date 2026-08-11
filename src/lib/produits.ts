@@ -252,14 +252,22 @@ export const ACTION_HISTORIQUE_LABEL: Record<string, string> = {
   supprime: "Supprimé définitivement",
 };
 
-export const ETATS_TRAVAUX = ["a_verifier", "non_necessaire", "necessaire", "en_cours", "termine"] as const;
-export type EtatTravaux = (typeof ETATS_TRAVAUX)[number];
+// Enums réels en base : etat_nettoyage se termine par « termine »,
+// etat_restauration par « terminee ». Il n'y a pas de valeur « en_cours ».
+export const ETATS_NETTOYAGE = ["a_verifier", "non_necessaire", "necessaire", "termine"] as const;
+export type EtatNettoyage = (typeof ETATS_NETTOYAGE)[number];
+
+export const ETATS_RESTAURATION = ["a_verifier", "non_necessaire", "necessaire", "terminee"] as const;
+export type EtatRestauration = (typeof ETATS_RESTAURATION)[number];
+
+export type EtatTravaux = EtatNettoyage | EtatRestauration;
+
 export const ETAT_TRAVAUX_LABEL: Record<EtatTravaux, string> = {
   a_verifier: "À vérifier",
   non_necessaire: "Non nécessaire",
   necessaire: "Nécessaire",
-  en_cours: "En cours",
   termine: "Terminé",
+  terminee: "Terminée",
 };
 
 export type ActionRequise =
