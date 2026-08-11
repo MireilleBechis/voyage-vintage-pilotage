@@ -541,18 +541,18 @@ function Grid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
 
-function EtatSelect({ label, value, onSave }: {
-  label: string; value: EtatTravaux; onSave: (v: EtatTravaux) => void;
+function EtatSelect<T extends EtatTravaux>({ label, value, options, onSave }: {
+  label: string; value: T; options: readonly T[]; onSave: (v: T) => void;
 }) {
   return (
     <div>
       <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</label>
       <select
         value={value}
-        onChange={(e) => onSave(e.target.value as EtatTravaux)}
+        onChange={(e) => onSave(e.target.value as T)}
         className="mt-0.5 w-full rounded-md border bg-card px-2 py-1.5 text-sm"
       >
-        {ETATS_TRAVAUX.map((e) => <option key={e} value={e}>{ETAT_TRAVAUX_LABEL[e]}</option>)}
+        {options.map((e) => <option key={e} value={e}>{ETAT_TRAVAUX_LABEL[e]}</option>)}
       </select>
     </div>
   );
