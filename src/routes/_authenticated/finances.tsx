@@ -30,15 +30,23 @@ function Finances() {
   const enLigne = enStock.filter((p) => p.statut === "EN_LIGNE").length;
   const prets = enStock.filter((p) => p.statut === "PRET_A_PUBLIER").length;
 
+  // Les colonnes financières sont masquées (null) pour les profils sans permission.
+  const coutsMasques = enStock.length > 0 && enStock.every((p) => p.cout_total == null);
+  const margesMasquees = enStock.length > 0 && enStock.every((p) => p.marge_potentielle == null);
+
   const coutStock = sum(enStock.map((p) => p.cout_total));
   const ventesPot = sum(enStock.map((p) => p.prix_vente_cible));
   const margePot = sum(enStock.map((p) => p.marge_potentielle));
   const ventesReal = sum(vendus.map((p) => p.prix_vente_reel));
   const margeReal = sum(vendus.map((p) => margeReelle(p) ?? 0));
-  const immobilise = coutStock - sum(vendus.map((p) => p.prix_vente_reel));
-  const rotation = enStock.length > 0 && coutStock > 0
+  // Capital immobilisé = coût total des produits encore en stock (les ventes
+  // réalisées ne sont, par définition, plus dans le stock).
+  const immobilise = coutStock;
+  const rotation = !coutsMasques && !margesMasquees && enStock.length > 0 && coutStock > 0
     ? Math.round((margePot / coutStock) * 100)
-    : 0;
+    : null;
+
+  const montant = (v: number, masque: boolean) => (masque ? "—" : eur(v));
 
   const parCat = groupBy(enStock, (p) => p.categorie);
   const parStatut = groupBy(enStock, (p) => p.statut);
