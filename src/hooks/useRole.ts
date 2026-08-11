@@ -18,7 +18,7 @@ export function useRole() {
       if (!uid) return { roles: [] as AppRole[], permissions: [] as Permission[] };
       const [rolesRes, permsRes] = await Promise.all([
         supabase.from("user_roles").select("role").eq("user_id", uid),
-        supabase.from("user_permissions" as never).select("permission").eq("user_id", uid),
+        supabase.from("user_permissions").select("permission").eq("user_id", uid),
       ]);
       const roles = ((rolesRes.data ?? []) as Array<{ role: AppRole }>).map((r) => r.role);
       const permissions = ((permsRes.data ?? []) as Array<{ permission: Permission }>).map((p) => p.permission);

@@ -9,7 +9,7 @@ export function useIsAdmin(): boolean {
       const uid = userData.user?.id;
       if (!uid) return false;
       const { data, error } = await supabase
-        .from("user_roles" as never)
+        .from("user_roles")
         .select("role")
         .eq("user_id", uid)
         .eq("role", "admin")

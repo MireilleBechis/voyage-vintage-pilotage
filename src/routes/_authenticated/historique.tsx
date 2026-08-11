@@ -20,7 +20,7 @@ function HistoriquePage() {
     queryKey: ["historique-global"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("produit_historique" as never)
+        .from("produit_historique")
         .select("id, produit_id, identifiant, action, acteur_email, created_at, details")
         .order("created_at", { ascending: false })
         .limit(2000);
