@@ -1,79 +1,67 @@
-## Préalable — Corriger l'Étape 8 (migration unique)
+# Audit lecture seule — Voyage Vintage
 
-1. **Vue `produits_public`** : ajouter `WHERE visibilite IN ('PARTICULIER','PRO','TOUS') AND disponibilite <> 'NON_DISPONIBLE' AND validation_statut = 'valide' AND archived_at IS NULL AND trashed_at IS NULL`. Filtrer aussi `visibilite = 'PARTICULIER'` seulement pour invité particulier, `'PRO'` seulement pour invité pro.
-2. **GRANTs** : `GRANT SELECT ON produits_public TO authenticated`.
-3. **Policies `produits`** : recréer toutes en `TO authenticated`, avec `WITH CHECK (owner_id = auth.uid())` sur INSERT/UPDATE. Supprimer les policies `{public}`.
-4. **Pas de SELECT direct sur `produits` pour invités** : leurs policies passent uniquement par la vue.
-5. Relancer `supabase--linter` et documenter chaque warning restant (fichier, règle, justification, mesure de mitigation).
+Aucune modification effectuée. Constats vérifiés par lecture des migrations, de la définition réelle des vues en base et du code front.
 
-## Étape 9 — Page « Utilisateurs et accès »
+## 1. Vue `produits_public` — colonnes sensibles : CONFORME
 
-### Base de données
+La définition réelle en base ne contient **aucune** colonne financière interne : pas de `prix_achat`, `cout_travaux`, `cout_transport`, `cout_total`, `marge_potentielle`, `prix_minimum_accepte`, `prix_minimum_interne`, `notes`, `owner_id`, `import_original`.
+Elle expose uniquement : identité produit, photos, `prix_public_ttc`, `prix_pro_ht` (conditionné au rôle pro/interne), TVA, dates. Filtre `WHERE` correct par rôle et visibilité, archivés/corbeille exclus. `anon` révoqué.
 
-Nouvelle migration :
+Sévérité : aucune. Le bug initial est bien corrigé.
 
-- **Enum `role_permission`** étendu : ajouter `consulter_stock`, `ajouter_photos`, `modifier_statuts`, `gerer_taches`, `modifier_prix_public`, `modifier_prix_pro`, `voir_factures_vente`, `gerer_ventes`, `importer`, `gerer_utilisateurs`, `consulter_historique`.
-- **Enum `app_role`** : ajouter `admin_principal` (unique protégé).
-- **Table `user_profiles_admin`** : `user_id`, `nom`, `statut_compte` (`actif|suspendu|desactive|en_attente`), `date_invitation`, `derniere_connexion`, `date_expiration`, `cree_par`, `modifie_par`.
-- **Table `user_invitations`** : `id`, `email`, `nom`, `role`, `permissions[]`, `date_expiration`, `message`, `token`, `invite_par`, `accepted_at`, `revoked_at`.
-- **Table `admin_audit_log`** : `id`, `acteur_id`, `cible_id`, `action` (`invitation|acceptation|role_change|perm_change|suspension|revocation|reactivation|pro_validation`), `ancienne_valeur jsonb`, `nouvelle_valeur jsonb`, `created_at`.
-- **Table `invite_pro_validations`** : `user_id`, `statut` (`en_attente|valide|refuse|suspendu`), `valide_par`, `valide_le`, `motif`.
-- **Trigger** : empêcher la suppression/rétrogradation du dernier `admin_principal` actif.
-- **Trigger** : refuser toute écriture sur `user_roles` en dehors des server functions autorisées (garde-fou en plus des RLS).
-- **RLS** : `user_profiles_admin`, `user_invitations`, `admin_audit_log`, `invite_pro_validations` — SELECT/UPDATE réservés aux users avec `gerer_utilisateurs` OU rôle `admin`/`admin_principal`.
+## 2. NOUVEAU problème critique : la vue `produits_public` est accessible en écriture
 
-### Server functions (`src/lib/admin-users.functions.ts`)
+Privilèges réels en base :
 
-Tous avec `requireSupabaseAuth` + double check `has_permission(userId, 'gerer_utilisateurs')` OR `has_role(userId, 'admin_principal')`. `supabaseAdmin` importé dynamiquement dans le handler.
+```text
+produits_public  ->  authenticated = arwdDxtm   (SELECT, INSERT, UPDATE, DELETE, ...)
+produits_public  ->  reloptions = security_invoker=off
+```
 
-- `listUsers()` — join `auth.users` + `profiles` + `user_roles` + `user_permissions` + `user_profiles_admin`.
-- `inviteUser({ email, nom, role, permissions, date_expiration, message })` — appelle `auth.admin.inviteUserByEmail`, insère l'invitation, log l'audit. **Rejette explicitement `role = 'admin_principal'`.**
-- `updateUserRole({ userId, role })` — refuse si `role = admin_principal` sauf appelant est admin_principal ; refuse si tentative de retirer le dernier admin_principal ; log l'audit.
-- `updateUserPermissions({ userId, add[], remove[] })` — log ancien/nouveau.
-- `suspendUser({ userId })` / `reactivateUser({ userId })` / `revokeUser({ userId })` — met à jour `statut_compte`, révoque les sessions via `auth.admin.signOut(userId, 'global')`.
-- `resendInvitation({ invitationId })` / `expireInvitation({ invitationId })`.
-- `validateInvitePro({ userId, decision, motif })` — passe le statut de `invite_pro_validations`, ajoute/retire le rôle `invite_pro`, log.
+Conséquences :
+- La vue est auto-modifiable par Postgres pour toutes ses colonnes simples (`prix_public_ttc`, `description`, `visibilite`, `disponibilite`, `photos`, `titre_commercial`, ...).
+- Avec `security_invoker=off`, une écriture s'exécute avec les droits du propriétaire de la vue et **contourne totalement la RLS de `produits`**.
+- Un simple `invite_particulier` peut donc, via `PATCH /rest/v1/produits_public` ou `DELETE`, modifier ou supprimer les lignes qu'il voit — alors que tout l'effort de verrouillage porte sur `produits` et les RPC.
 
-### Interface
+Sévérité : **critique**. Le correctif attendu est un `REVOKE INSERT, UPDATE, DELETE ON public.produits_public FROM authenticated` (garder `SELECT`).
 
-- `src/routes/_authenticated/_admin/route.tsx` — layout pathless gate qui redirige si l'user n'a pas `gerer_utilisateurs`.
-- `src/routes/_authenticated/_admin/utilisateurs.tsx` — page principale.
-- Tableau responsive (cartes empilées <768px) : nom, email, rôle, statut, permissions (badges), invité le, dernière connexion, expire le, créé/modifié par.
-- Filtres : rôle, statut, avec/sans accès financier, invité pro en attente.
-- Dialog « Inviter » — formulaire (zod : email valide, nom, rôle sans admin_principal, permissions multi-select, expiration optionnelle, message optionnel).
-- Dialog « Modifier accès » — édition rôle + permissions granulaires.
-- Section « Invités pro en attente » — approuver / refuser avec motif.
-- Bouton « Suspendre / Réactiver / Révoquer » avec confirmation.
-- Confirmation renforcée (saisie du texte `TRANSFERER` + email) pour toute modification touchant `admin_principal`.
-- `src/routes/_authenticated/_admin/audit.tsx` — journal filtrable par acteur, cible, action, période. Export CSV/XLSX (réutiliser `export-historique.ts`).
+À noter : `produits_interne` n'a aucun grant pour `authenticated` — bon, tout passe par les RPC. Aucun accès direct restant à `produits` côté front (seul `import.functions.ts` l'utilise, côté serveur via `supabaseAdmin`).
 
-### Ajout AppShell
+## 3. Calcul « Argent immobilisé » — BUGGÉ
 
-- Onglet « Admin » (icône Shield) visible seulement si `has('gerer_utilisateurs')` ou `isAdmin`. Sous-menu : Utilisateurs, Audit.
+`src/routes/_authenticated/finances.tsx:38`
 
-### Tests (Playwright headless, sandbox uniquement)
+```ts
+const immobilise = coutStock - sum(vendus.map((p) => p.prix_vente_reel));
+```
 
-Créer 8 comptes de test **avec préfixe `test-vv-`** (jamais tes comptes) :
+Problèmes :
+- Elle retranche le **chiffre d'affaires des ventes** d'un **coût de stock** : deux grandeurs sans rapport. Le capital immobilisé est simplement le coût total des articles encore en stock, donc déjà égal à `coutStock` (ligne 33).
+- Le résultat devient négatif dès que les ventes cumulées dépassent le coût du stock restant, ce qui affiche une valeur absurde.
+- Les statuts sont en revanche corrects : `enStock` exclut `VENDU`/`ARCHIVE`, et la liste est déjà filtrée des archivés/corbeille (ligne 23). `RESERVE` est compté en stock, ce qui est défendable mais à confirmer.
 
-- `test-vv-admin@…`, `test-vv-collab-nofin@…`, `test-vv-collab-fin@…`, `test-vv-part@…`, `test-vv-pro-pending@…`, `test-vv-pro-valide@…`, `test-vv-suspendu@…`, `test-vv-invit-expiree@…`.
+Correctif attendu : `immobilise = coutStock`, ou une définition explicite (ex. coût des seuls articles pas encore en ligne) ; dans ce cas, supprimer le doublon avec la KPI « Coût du stock ».
 
-Pour chacun, vérifier :
+Sévérité : **haute** (chiffre affiché faux sur le tableau de bord).
 
-1. Colonnes visibles dans la fiche produit (matrice attendue par rôle).
-2. Champs éditables (visibilité, tarifs, prix d'achat) selon permissions.
-3. Accès direct à `/produit/<uuid>` d'un produit privé → 404 pour les invités.
-4. Tentative UPDATE `user_roles` via console → refus RLS.
-5. Tentative d'appel server fn admin sans permission → 401/403.
-6. Suspension → sessions révoquées, redirection `/auth`.
-7. Invitation expirée → refus d'acceptation.
-8. Screenshot de chaque écran de la page Utilisateurs sur mobile/tablette/desktop.
+Effet de bord lié : pour un collaborateur sans permission finance, `cout_total` / `marge_potentielle` reviennent à `null` de la vue, et `sum()` les convertit en `0` — le tableau de bord affiche silencieusement « 0 € » au lieu d'indiquer que la donnée est masquée. Sévérité : moyenne (UX/lisibilité, pas une fuite).
 
-Script sous `/tmp/browser/vv-rbac/run.py`. Nettoyage automatique des 8 comptes en fin de run.
+## 4. Autres incohérences relevées
 
-### Livrable
+| # | Fichier | Problème | Sévérité |
+|---|---------|----------|----------|
+| a | `src/lib/produits.ts:307-327` | La liste `PERMISSIONS` ne contient pas les permissions granulaires ajoutées en base : `voir_couts`, `voir_prix_minimum`, `modifier_prix_achat`, `modifier_prix_public`, `modifier_prix_pro`, `modifier_prix_minimum`. L'écran Administration ne peut donc pas les attribuer, alors que les vues et RPC les contrôlent → les collaborateurs restent bloqués sur ces droits. | Haute (fonctionnelle) |
+| b | `src/lib/produits.ts:238-246` | `ETATS_TRAVAUX` déclare `en_cours` (inexistant dans les enums `etat_nettoyage` / `etat_restauration`) et utilise `termine` pour la restauration alors que la base attend `terminee`. Un enregistrement avec ces valeurs échoue côté base. | Haute |
+| c | `src/lib/produits.ts:157` | `statut_origine: "automatique" \| "manuel" \| "import"` — `import` n'existe pas dans l'enum `origine_statut`. | Faible |
+| d | `src/lib/produits.ts:90-99` | `TypeAction` couvre 9 valeurs alors que l'enum `type_action` en compte 16 (`expertiser_prix`, `verifier_etat`, `mesurer`, `tester`, `emballer`, `relancer`, ...) : les libellés retombent sur `undefined` si une tâche utilise ces types. | Moyenne |
+| e | `src/lib/produits-api.ts` / `useRole.ts` | Usage massif de `as never` pour contourner les types Supabase non régénérés pour les RPC et `user_permissions` : aucun contrôle de typage sur les payloads envoyés aux fonctions sécurisées. | Moyenne (dette) |
+| f | `src/routes/_authenticated/finances.tsx:96` | `STATUT_COULEUR[...].split(" ")[0]` réutilise une classe de badge (`bg-warning/15`) comme couleur de barre : rendu quasi invisible pour plusieurs statuts. | Faible (cosmétique) |
 
-- 1 migration (correctifs Étape 8 + tables Étape 9).
-- Server functions admin.
-- Pages `/utilisateurs` et `/audit` sous gate `_admin`.
-- Rapport de tests Playwright avec matrice de permissions vérifiée.
-- Mise à jour `mem://` pour tracer les décisions (rôles, gates, tables).
+## Synthèse
+
+- Correct : projection de `produits_public` (colonnes + filtre rôle), verrouillage de `produits` et `produits_interne`, absence d'accès direct depuis le navigateur, blocage `anon`.
+- Critique : droits d'écriture `authenticated` sur `produits_public` avec `security_invoker=off` → contournement de RLS.
+- Haute : « Argent immobilisé » faux ; permissions granulaires absentes du front ; enums travaux désalignés.
+- Moyenne/faible : masquage financier rendu en « 0 € », types d'action incomplets, `as never`, couleurs de barres.
+
+Dis-moi si tu veux que je prépare un plan de correction pour tout ou partie de ces points.
