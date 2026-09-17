@@ -30,22 +30,28 @@ export const importInitialStock = createServerFn({ method: "POST" })
 
     // --- Référentiels : on récupère l'existant et on crée les valeurs manquantes.
     type Ref = { id: string; slug: string };
-    const charger = async (table: "categories" | "types_objet" | "matieres") => {
+    const charger = async (table: "categories" | "types_objet") => {
       const { data } = await supabaseAdmin.from(table).select("id, slug");
       const map = new Map<string, string>();
-      for (const r of (data ?? []) as Ref[]) map.set(r.slug, r.id);
+      for (const r of (data ?? []) as unknown as Ref[]) map.set(r.slug, r.id);
       return map;
     };
     const cats = await charger("categories");
     const types = await charger("types_objet");
-    const matieres = await charger("matieres");
+
+    // Les matières n'ont pas de slug : on indexe par libellé normalisé.
+    const { data: matData } = await supabaseAdmin.from("matieres").select("id, libelle");
+    const matieres = new Map<string, string>();
+    for (const r of (matData ?? []) as unknown as Array<{ id: string; libelle: string }>) {
+      matieres.set(slugify(r.libelle), r.id);
+    }
 
     const { data: scData } = await supabaseAdmin.from("sous_categories").select("id, slug, categorie_id");
     const sousCats = new Map<string, string>();
     for (const r of (scData ?? []) as Array<{ id: string; slug: string }>) sousCats.set(r.slug, r.id);
 
     async function assurer(
-      table: "categories" | "types_objet" | "matieres",
+      table: "categories" | "types_objet",
       map: Map<string, string>,
       libelle: string,
     ): Promise<string | null> {
@@ -62,6 +68,23 @@ export const importInitialStock = createServerFn({ method: "POST" })
         .single();
       if (error || !data) return null;
       map.set(slug, data.id);
+      return data.id;
+    }
+
+    async function assurerMatiere(libelle: string): Promise<string | null> {
+      const lib = libelle.trim();
+      if (!lib) return null;
+      const cle = slugify(lib);
+      if (!cle) return null;
+      const found = matieres.get(cle);
+      if (found) return found;
+      const { data, error } = await supabaseAdmin
+        .from("matieres")
+        .insert({ libelle: lib, ordre: 999, actif: true })
+        .select("id")
+        .single();
+      if (error || !data) return null;
+      matieres.set(cle, data.id);
       return data.id;
     }
 
@@ -110,7 +133,7 @@ export const importInitialStock = createServerFn({ method: "POST" })
       const sousCategorieId = await assurerSousCategorie(sousCategorieLib, categorieId);
       const typeId = await assurer("types_objet", types, typeLib);
       // La matière importée est libre : on la crée à la racine si elle n'existe pas.
-      const matiereId = await assurer("matieres", matieres, materiauxLib.split(/[,/;]/)[0] ?? "");
+      const matiereId = await assurerMatiere(materiauxLib.split(/[,/;]/)[0] ?? "");
 
       if (categorieId) {
         await supabaseAdmin.from("produit_categories").insert({ produit_id: produit.id, categorie_id: categorieId });
