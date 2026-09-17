@@ -100,7 +100,7 @@ function Finances() {
             label: STATUT_LABEL[s as Statut] ?? s,
             count: items.length,
             value: sum(items.map((p) => p.cout_total)),
-            colorClass: STATUT_COULEUR[s as Statut] ?? "bg-secondary",
+            colorClass: STATUT_BARRE[s as Statut] ?? "bg-primary",
           }))}
           total={enStock.length}
           masked={coutsMasques}
