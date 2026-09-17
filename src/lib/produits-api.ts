@@ -21,17 +21,17 @@ export async function getProduitInterne(id: string): Promise<Produit | null> {
 }
 
 export async function updateProduit(id: string, patch: Record<string, unknown>): Promise<void> {
-  const { error } = await supabase.rpc("update_produit" as never, {
+  const { error } = await supabase.rpc("update_produit", {
     _id: id,
-    _data: patch,
-  } as never);
+    _data: patch as never,
+  });
   if (error) throw error;
 }
 
 export async function createProduit(data: Record<string, unknown>): Promise<string> {
-  const { data: row, error } = await supabase.rpc("create_produit" as never, {
-    _data: data,
-  } as never);
+  const { data: row, error } = await supabase.rpc("create_produit", {
+    _data: data as never,
+  });
   if (error) throw error;
   const r = Array.isArray(row) ? row[0] : row;
   return (r as { id: string }).id;

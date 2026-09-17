@@ -1,7 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listProduitsInterne } from "@/lib/produits-api";
-import { CAT_LABEL, margeReelle, STATUT_COULEUR, STATUT_LABEL, type Produit, type Statut } from "@/lib/produits";
+import { CAT_LABEL, margeReelle, STATUT_LABEL, type Produit, type Statut } from "@/lib/produits";
+
+// Couleurs pleines pour les barres du tableau de bord : les tokens de badge
+// (fonds à 15 % d'opacité) sont quasi invisibles sur une barre fine.
+const STATUT_BARRE: Record<Statut, string> = {
+  A_IDENTIFIER: "bg-warning",
+  A_EXPERTISER: "bg-warning",
+  ETAT_A_VERIFIER: "bg-muted-foreground",
+  A_NETTOYER: "bg-muted-foreground",
+  A_RESTAURER: "bg-muted-foreground",
+  A_PHOTOGRAPHIER: "bg-accent",
+  A_REDIGER: "bg-accent",
+  PRET_A_PUBLIER: "bg-primary",
+  EN_LIGNE: "bg-primary",
+  RESERVE: "bg-accent",
+  VENDU: "bg-foreground/60",
+  ARCHIVE: "bg-muted-foreground/60",
+};
 import { eur } from "@/lib/format";
 import { differenceInDays, parseISO } from "date-fns";
 
@@ -100,7 +117,7 @@ function Finances() {
             label: STATUT_LABEL[s as Statut] ?? s,
             count: items.length,
             value: sum(items.map((p) => p.cout_total)),
-            colorClass: STATUT_COULEUR[s as Statut] ?? "bg-secondary",
+            colorClass: STATUT_BARRE[s as Statut] ?? "bg-primary",
           }))}
           total={enStock.length}
           masked={coutsMasques}
