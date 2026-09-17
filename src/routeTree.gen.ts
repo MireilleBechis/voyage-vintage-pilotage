@@ -16,6 +16,7 @@ import { Route as AuthenticatedVentesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTachesRouteImport } from './routes/_authenticated/taches'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticated/qualite'
+import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
 import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticated/finances'
@@ -58,6 +59,11 @@ const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
 const AuthenticatedQualiteRoute = AuthenticatedQualiteRouteImport.update({
   id: '/qualite',
   path: '/qualite',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
+  id: '/lots',
+  path: '/lots',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/finances': typeof AuthenticatedFinancesRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/taches': typeof AuthenticatedTachesRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/finances': typeof AuthenticatedFinancesRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/taches': typeof AuthenticatedTachesRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/finances': typeof AuthenticatedFinancesRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
+  '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/qualite': typeof AuthenticatedQualiteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/_authenticated/taches': typeof AuthenticatedTachesRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/finances'
     | '/historique'
     | '/kanban'
+    | '/lots'
     | '/qualite'
     | '/stock'
     | '/taches'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/finances'
     | '/historique'
     | '/kanban'
+    | '/lots'
     | '/qualite'
     | '/stock'
     | '/taches'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finances'
     | '/_authenticated/historique'
     | '/_authenticated/kanban'
+    | '/_authenticated/lots'
     | '/_authenticated/qualite'
     | '/_authenticated/stock'
     | '/_authenticated/taches'
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/qualite'
       fullPath: '/qualite'
       preLoaderRoute: typeof AuthenticatedQualiteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/lots': {
+      id: '/_authenticated/lots'
+      path: '/lots'
+      fullPath: '/lots'
+      preLoaderRoute: typeof AuthenticatedLotsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/kanban': {
@@ -346,6 +365,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinancesRoute: typeof AuthenticatedFinancesRoute
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
+  AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedQualiteRoute: typeof AuthenticatedQualiteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedTachesRoute: typeof AuthenticatedTachesRoute
@@ -362,6 +382,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinancesRoute: AuthenticatedFinancesRoute,
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
+  AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedQualiteRoute: AuthenticatedQualiteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedTachesRoute: AuthenticatedTachesRoute,
