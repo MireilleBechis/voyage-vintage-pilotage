@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getProduitInterne, updateProduit } from "@/lib/produits-api";
 import {
-  STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut, CAT_LABEL,
+  STATUT_LABEL, STATUTS, statutSuivant, type Produit, type Statut,
   STATUT_COULEUR, ETATS_NETTOYAGE, ETATS_RESTAURATION, ETAT_TRAVAUX_LABEL, type EtatTravaux,
   ACTION_REQUISE_LABEL, ACTION_REQUISE_COULEUR, type ActionRequise,
   ACTION_LABEL, type TypeAction, ACTION_HISTORIQUE_LABEL, MOTIF_ARCHIVAGE_LABEL,
@@ -18,6 +18,9 @@ import { eur, dateFr, anciennete } from "@/lib/format";
 import { AlertTriangle, Camera, ChevronLeft, Copy as CopyIcon, CheckCircle2, Lock, Unlock, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { ProduitMenu } from "@/components/ProduitMenu";
+import { RattachementsEditor, type Rattachements } from "@/components/RattachementsEditor";
+import { setProduitRattachements } from "@/lib/produits-api";
+import { listCategorieChamps, CHAMP_LABEL_DEFAUT, type ChampSpecifique } from "@/lib/referentiels";
 import { restaurerArchive } from "@/lib/produit-actions";
 import { exportHistoriqueCsv, exportHistoriqueXlsx } from "@/lib/export-historique";
 
@@ -177,7 +180,7 @@ function Fiche() {
               {p.identifiant}
             </p>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
-              {CAT_LABEL[p.categorie]}{p.sous_categorie ? ` · ${p.sous_categorie}` : ""}
+              {[...(p.categories_libelles ?? []), ...(p.sous_categories_libelles ?? [])].join(" · ") || "Sans catégorie"}
             </p>
             <h1 className="font-serif text-3xl leading-tight mt-1">{p.designer_ou_marque ?? "—"}</h1>
             <p className="text-sm text-muted-foreground">
@@ -347,6 +350,11 @@ function Fiche() {
 
 
 
+        <SectionTitle>Classement & matières</SectionTitle>
+        <ProduitRattachements p={p} onSaved={() => qc.invalidateQueries({ queryKey: ["produit", id] })} />
+
+        <ChampsAdaptatifs p={p} editing={editing} onSave={(patch) => updateMut.mutate(patch)} />
+
         <SectionTitle>Identification</SectionTitle>
         <Grid>
           <TextField label="Designer / marque" editing={editing} value={p.designer_ou_marque}
@@ -357,8 +365,6 @@ function Fiche() {
             onSave={(v) => updateMut.mutate({ modele: v as string })} display={p.modele ?? "—"} />
           <TextField label="Année" editing={editing} value={p.annee}
             onSave={(v) => updateMut.mutate({ annee: v as string })} display={p.annee ?? "—"} />
-          <TextField label="Matériaux" editing={editing} value={p.materiaux}
-            onSave={(v) => updateMut.mutate({ materiaux: v as string })} display={p.materiaux ?? "—"} />
           <TextField label="Couleur" editing={editing} value={p.couleur}
             onSave={(v) => updateMut.mutate({ couleur: v as string })} display={p.couleur ?? "—"} />
           <TextField label="Dimensions" editing={editing} value={p.dimensions}
@@ -626,5 +632,90 @@ function TextAreaField({ label, value, editing, onSave }: {
         <p className="text-sm mt-0.5 whitespace-pre-wrap">{value || "—"}</p>
       )}
     </div>
+  );
+}
+
+function ProduitRattachements({ p, onSaved }: { p: Produit; onSaved: () => void }) {
+  const principale = (p.matieres ?? []).find((m) => m.role === "principale") ?? null;
+  const secondaire = (p.matieres ?? []).find((m) => m.role === "secondaire") ?? null;
+  const [val, setVal] = useState<Rattachements>({
+    categories: p.categorie_ids ?? [],
+    sousCategories: p.sous_categorie_ids ?? [],
+    types: p.type_objet_ids ?? [],
+    matierePrincipale: principale?.matiere_id ?? null,
+    matiereSecondaire: secondaire?.matiere_id ?? null,
+    categorieShopifyId: p.categorie_shopify_id ?? null,
+  });
+  const [dirty, setDirty] = useState(false);
+
+  const mut = useMutation({
+    mutationFn: async () => {
+      const matieres: Array<{ matiere_id: string; role: "principale" | "secondaire" }> = [];
+      if (val.matierePrincipale) matieres.push({ matiere_id: val.matierePrincipale, role: "principale" });
+      if (val.matiereSecondaire) matieres.push({ matiere_id: val.matiereSecondaire, role: "secondaire" });
+      await setProduitRattachements(p.id, {
+        categories: val.categories,
+        sousCategories: val.sousCategories,
+        types: val.types,
+        matieres,
+      });
+      await updateProduit(p.id, { categorie_shopify_id: val.categorieShopifyId });
+    },
+    onSuccess: () => { setDirty(false); toast.success("Classement enregistré"); onSaved(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="rounded-lg border bg-card p-3 space-y-3">
+      <RattachementsEditor value={val} onChange={(v) => { setVal(v); setDirty(true); }} />
+      {p.lot_id && (
+        <p className="text-xs">
+          Lot :{" "}
+          <Link to="/lots" className="text-primary underline">
+            {p.lot_identifiant} — {p.lot_libelle}
+          </Link>
+        </p>
+      )}
+      {dirty && (
+        <button onClick={() => mut.mutate()} disabled={mut.isPending}
+          className="w-full rounded-md bg-primary text-primary-foreground py-2 text-sm">
+          {mut.isPending ? "Enregistrement…" : "Enregistrer le classement"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ChampsAdaptatifs({
+  p, editing, onSave,
+}: { p: Produit; editing: boolean; onSave: (patch: Partial<Produit>) => void }) {
+  const champsQ = useQuery({ queryKey: ["categorie_champs"], queryFn: listCategorieChamps });
+  const cats = p.categorie_ids ?? [];
+  const champs = (champsQ.data ?? [])
+    .filter((c) => cats.includes(c.categorie_id))
+    .sort((a, b) => a.ordre - b.ordre);
+  const vus = new Set<string>();
+  const uniques = champs.filter((c) => (vus.has(c.champ) ? false : (vus.add(c.champ), true)));
+  if (uniques.length === 0) return null;
+  return (
+    <>
+      <SectionTitle>Caractéristiques spécifiques</SectionTitle>
+      <Grid>
+        {uniques.map((c) => {
+          const key = c.champ as ChampSpecifique;
+          const valeur = (p as unknown as Record<string, string | null>)[c.champ] ?? null;
+          return (
+            <TextField
+              key={c.id}
+              label={`${c.libelle || CHAMP_LABEL_DEFAUT[key] || c.champ}${c.obligatoire ? " *" : ""}`}
+              editing={editing}
+              value={valeur}
+              onSave={(v) => onSave({ [c.champ]: v } as Partial<Produit>)}
+              display={valeur ?? "—"}
+            />
+          );
+        })}
+      </Grid>
+    </>
   );
 }

@@ -16,6 +16,7 @@ import { Route as AuthenticatedVentesRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedTachesRouteImport } from './routes/_authenticated/taches'
 import { Route as AuthenticatedStockRouteImport } from './routes/_authenticated/stock'
 import { Route as AuthenticatedQualiteRouteImport } from './routes/_authenticated/qualite'
+import { Route as AuthenticatedLotsRouteImport } from './routes/_authenticated/lots'
 import { Route as AuthenticatedKanbanRouteImport } from './routes/_authenticated/kanban'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
 import { Route as AuthenticatedFinancesRouteImport } from './routes/_authenticated/finances'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedDebloquerRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCorbeilleRouteImport } from './routes/_authenticated/corbeille'
 import { Route as AuthenticatedAujourdhuiRouteImport } from './routes/_authenticated/aujourdhui'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProduitNouveauRouteImport } from './routes/_authenticated/produit.nouveau'
 import { Route as AuthenticatedProduitIdRouteImport } from './routes/_authenticated/produit.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -57,6 +59,11 @@ const AuthenticatedStockRoute = AuthenticatedStockRouteImport.update({
 const AuthenticatedQualiteRoute = AuthenticatedQualiteRouteImport.update({
   id: '/qualite',
   path: '/qualite',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLotsRoute = AuthenticatedLotsRouteImport.update({
+  id: '/lots',
+  path: '/lots',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedKanbanRoute = AuthenticatedKanbanRouteImport.update({
@@ -94,6 +101,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProduitNouveauRoute =
+  AuthenticatedProduitNouveauRouteImport.update({
+    id: '/produit/nouveau',
+    path: '/produit/nouveau',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProduitIdRoute = AuthenticatedProduitIdRouteImport.update({
   id: '/produit/$id',
   path: '/produit/$id',
@@ -110,11 +123,13 @@ export interface FileRoutesByFullPath {
   '/finances': typeof AuthenticatedFinancesRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/taches': typeof AuthenticatedTachesRoute
   '/ventes': typeof AuthenticatedVentesRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
+  '/produit/nouveau': typeof AuthenticatedProduitNouveauRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,11 +141,13 @@ export interface FileRoutesByTo {
   '/finances': typeof AuthenticatedFinancesRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/kanban': typeof AuthenticatedKanbanRoute
+  '/lots': typeof AuthenticatedLotsRoute
   '/qualite': typeof AuthenticatedQualiteRoute
   '/stock': typeof AuthenticatedStockRoute
   '/taches': typeof AuthenticatedTachesRoute
   '/ventes': typeof AuthenticatedVentesRoute
   '/produit/$id': typeof AuthenticatedProduitIdRoute
+  '/produit/nouveau': typeof AuthenticatedProduitNouveauRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,11 +161,13 @@ export interface FileRoutesById {
   '/_authenticated/finances': typeof AuthenticatedFinancesRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/kanban': typeof AuthenticatedKanbanRoute
+  '/_authenticated/lots': typeof AuthenticatedLotsRoute
   '/_authenticated/qualite': typeof AuthenticatedQualiteRoute
   '/_authenticated/stock': typeof AuthenticatedStockRoute
   '/_authenticated/taches': typeof AuthenticatedTachesRoute
   '/_authenticated/ventes': typeof AuthenticatedVentesRoute
   '/_authenticated/produit/$id': typeof AuthenticatedProduitIdRoute
+  '/_authenticated/produit/nouveau': typeof AuthenticatedProduitNouveauRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -162,11 +181,13 @@ export interface FileRouteTypes {
     | '/finances'
     | '/historique'
     | '/kanban'
+    | '/lots'
     | '/qualite'
     | '/stock'
     | '/taches'
     | '/ventes'
     | '/produit/$id'
+    | '/produit/nouveau'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -178,11 +199,13 @@ export interface FileRouteTypes {
     | '/finances'
     | '/historique'
     | '/kanban'
+    | '/lots'
     | '/qualite'
     | '/stock'
     | '/taches'
     | '/ventes'
     | '/produit/$id'
+    | '/produit/nouveau'
   id:
     | '__root__'
     | '/'
@@ -195,11 +218,13 @@ export interface FileRouteTypes {
     | '/_authenticated/finances'
     | '/_authenticated/historique'
     | '/_authenticated/kanban'
+    | '/_authenticated/lots'
     | '/_authenticated/qualite'
     | '/_authenticated/stock'
     | '/_authenticated/taches'
     | '/_authenticated/ventes'
     | '/_authenticated/produit/$id'
+    | '/_authenticated/produit/nouveau'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -259,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQualiteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lots': {
+      id: '/_authenticated/lots'
+      path: '/lots'
+      fullPath: '/lots'
+      preLoaderRoute: typeof AuthenticatedLotsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/kanban': {
       id: '/_authenticated/kanban'
       path: '/kanban'
@@ -308,6 +340,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/produit/nouveau': {
+      id: '/_authenticated/produit/nouveau'
+      path: '/produit/nouveau'
+      fullPath: '/produit/nouveau'
+      preLoaderRoute: typeof AuthenticatedProduitNouveauRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/produit/$id': {
       id: '/_authenticated/produit/$id'
       path: '/produit/$id'
@@ -326,11 +365,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinancesRoute: typeof AuthenticatedFinancesRoute
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
   AuthenticatedKanbanRoute: typeof AuthenticatedKanbanRoute
+  AuthenticatedLotsRoute: typeof AuthenticatedLotsRoute
   AuthenticatedQualiteRoute: typeof AuthenticatedQualiteRoute
   AuthenticatedStockRoute: typeof AuthenticatedStockRoute
   AuthenticatedTachesRoute: typeof AuthenticatedTachesRoute
   AuthenticatedVentesRoute: typeof AuthenticatedVentesRoute
   AuthenticatedProduitIdRoute: typeof AuthenticatedProduitIdRoute
+  AuthenticatedProduitNouveauRoute: typeof AuthenticatedProduitNouveauRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -341,11 +382,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinancesRoute: AuthenticatedFinancesRoute,
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
   AuthenticatedKanbanRoute: AuthenticatedKanbanRoute,
+  AuthenticatedLotsRoute: AuthenticatedLotsRoute,
   AuthenticatedQualiteRoute: AuthenticatedQualiteRoute,
   AuthenticatedStockRoute: AuthenticatedStockRoute,
   AuthenticatedTachesRoute: AuthenticatedTachesRoute,
   AuthenticatedVentesRoute: AuthenticatedVentesRoute,
   AuthenticatedProduitIdRoute: AuthenticatedProduitIdRoute,
+  AuthenticatedProduitNouveauRoute: AuthenticatedProduitNouveauRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

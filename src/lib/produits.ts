@@ -45,28 +45,8 @@ export const STATUT_COULEUR: Record<Statut, string> = {
   ARCHIVE: "bg-muted text-muted-foreground border-border",
 };
 
-export const CATEGORIES = [
-  "enceintes",
-  "chaises",
-  "fauteuils",
-  "tables",
-  "meubles",
-  "canapes",
-  "luminaires",
-  "autre",
-] as const;
-export type Categorie = (typeof CATEGORIES)[number];
-
-export const CAT_LABEL: Record<Categorie, string> = {
-  enceintes: "Enceintes",
-  chaises: "Chaises",
-  fauteuils: "Fauteuils",
-  tables: "Tables",
-  meubles: "Meubles",
-  canapes: "Canapés",
-  luminaires: "Luminaires",
-  autre: "Autre",
-};
+// Les catégories, sous-catégories, types d'objet et matières sont désormais
+// des référentiels administrables en base — voir src/lib/referentiels.ts.
 
 // Parcours de vente : ordre d'avancement pour "Marquer terminé"
 const PARCOURS: Statut[] = [
@@ -141,18 +121,36 @@ export function actionParStatut(s: Statut): TypeAction {
   }
 }
 
+export type MatiereRole = "principale" | "secondaire";
+
+export interface ProduitMatiere {
+  matiere_id: string;
+  role: MatiereRole;
+  libelle: string;
+  parent_id: string | null;
+}
+
 export interface Produit {
   id: string;
   identifiant: string;
-  categorie: Categorie;
-  sous_categorie: string | null;
+  // Référentiels multi-valeurs
+  categorie_ids: string[];
+  categories_libelles: string[];
+  sous_categorie_ids: string[];
+  sous_categories_libelles: string[];
+  type_objet_ids: string[];
+  types_libelles: string[];
+  matieres: ProduitMatiere[];
+  categorie_shopify_id: string | null;
+  // Appartenance à un lot
+  lot_id: string | null;
+  lot_identifiant: string | null;
+  lot_libelle: string | null;
   designer_ou_marque: string | null;
   editeur_ou_label: string | null;
-  type_objet: string | null;
   modele: string | null;
   annee: string | null;
   description: string | null;
-  materiaux: string | null;
   couleur: string | null;
   etat: string | null;
   dimensions: string | null;

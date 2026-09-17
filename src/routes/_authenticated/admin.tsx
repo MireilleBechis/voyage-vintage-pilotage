@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ReferentielsTab } from "@/components/ReferentielsTab";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -54,7 +55,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
-  const [tab, setTab] = useState<"utilisateurs" | "invitations" | "audit">("utilisateurs");
+  const [tab, setTab] = useState<"utilisateurs" | "invitations" | "référentiels" | "audit">("utilisateurs");
   return (
     <AppShell>
       <div className="mx-auto max-w-4xl p-4 space-y-4">
@@ -63,7 +64,7 @@ function AdminPage() {
           <p className="text-sm text-muted-foreground">Utilisateurs, accès et journal d'audit.</p>
         </header>
         <div className="flex gap-2 border-b">
-          {(["utilisateurs", "invitations", "audit"] as const).map((t) => (
+          {(["utilisateurs", "invitations", "référentiels", "audit"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -77,6 +78,7 @@ function AdminPage() {
         </div>
         {tab === "utilisateurs" && <UtilisateursTab />}
         {tab === "invitations" && <InvitationsTab />}
+        {tab === "référentiels" && <ReferentielsTab />}
         {tab === "audit" && <AuditTab />}
       </div>
     </AppShell>

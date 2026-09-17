@@ -133,7 +133,7 @@ function Aujourdhui() {
                       <p className="text-[10px] tracking-widest uppercase text-brass">{it.produit.identifiant}</p>
                     </div>
                     <h3 className="font-serif text-xl mt-2 leading-tight">{it.produit.designer_ou_marque ?? "—"}</h3>
-                    <p className="text-xs text-muted-foreground">{it.produit.modele ?? it.produit.type_objet ?? "—"}</p>
+                    <p className="text-xs text-muted-foreground">{it.produit.modele ?? it.produit.types_libelles?.[0] ?? "—"}</p>
                     <p className="text-sm mt-2 italic text-primary">« {it.raison} »</p>
                   </div>
                 </div>

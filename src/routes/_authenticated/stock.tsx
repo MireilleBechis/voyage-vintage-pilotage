@@ -1,18 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listProduitsInterne } from "@/lib/produits-api";
 import {
-  CAT_LABEL,
-  CATEGORIES,
   STATUT_LABEL,
   STATUTS,
   ACTION_REQUISE_LABEL,
   type Produit,
   type ActionRequise,
 } from "@/lib/produits";
+import {
+  listCategories,
+  listSousCategories,
+  listTypesObjet,
+  listMatieres,
+  normaliser,
+} from "@/lib/referentiels";
 import { ProduitCard } from "@/components/ProduitCard";
-import { LayoutGrid, List, Search } from "lucide-react";
+import { LayoutGrid, List, Plus, Search } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   head: () => ({
@@ -55,9 +60,17 @@ function Stock() {
   const [audience, setAudience] = useState<Audience>("actifs");
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("");
+  const [sousCat, setSousCat] = useState<string>("");
+  const [typeObjet, setTypeObjet] = useState<string>("");
+  const [matiere, setMatiere] = useState<string>("");
   const [stat, setStat] = useState<string>("");
   const [action, setAction] = useState<string>("");
   const [tri, setTri] = useState<Tri>("identifiant");
+
+  const categoriesQ = useQuery({ queryKey: ["categories"], queryFn: listCategories });
+  const sousCategoriesQ = useQuery({ queryKey: ["sous_categories"], queryFn: listSousCategories });
+  const typesQ = useQuery({ queryKey: ["types_objet"], queryFn: listTypesObjet });
+  const matieresQ = useQuery({ queryKey: ["matieres"], queryFn: listMatieres });
 
   const produitsQ = useQuery({
     queryKey: ["produits", audience],
@@ -72,15 +85,36 @@ function Stock() {
     },
   });
 
+  const sousCategoriesVisibles = (sousCategoriesQ.data ?? []).filter(
+    (sc) => !cat || sc.categorie_id === cat,
+  );
+
   const filtered = useMemo(() => {
     const list = produitsQ.data ?? [];
+    const recherche = normaliser(q.trim());
     const out = list.filter((p) => {
-      if (cat && p.categorie !== cat) return false;
+      if (cat && !(p.categorie_ids ?? []).includes(cat)) return false;
+      if (sousCat && !(p.sous_categorie_ids ?? []).includes(sousCat)) return false;
+      if (typeObjet && !(p.type_objet_ids ?? []).includes(typeObjet)) return false;
+      if (matiere && !(p.matieres ?? []).some((m) => m.matiere_id === matiere)) return false;
       if (stat && p.statut !== stat) return false;
       if (action && !(p.actions_requises ?? []).includes(action as ActionRequise)) return false;
-      if (q) {
-        const s = `${p.identifiant} ${p.designer_ou_marque ?? ""} ${p.modele ?? ""} ${p.editeur_ou_label ?? ""}`.toLowerCase();
-        if (!s.includes(q.toLowerCase())) return false;
+      if (recherche) {
+        const champs = [
+          p.identifiant,
+          p.titre_commercial,
+          p.designer_ou_marque,
+          p.editeur_ou_label,
+          p.modele,
+          p.description,
+          ...(p.categories_libelles ?? []),
+          ...(p.sous_categories_libelles ?? []),
+          ...(p.types_libelles ?? []),
+          ...(p.matieres ?? []).map((m) => m.libelle),
+        ]
+          .filter(Boolean)
+          .join(" ");
+        if (!normaliser(champs).includes(recherche)) return false;
       }
       return true;
     });
@@ -99,15 +133,23 @@ function Stock() {
       }
     };
     return [...out].sort(cmp);
-  }, [produitsQ.data, cat, stat, action, q, tri]);
+  }, [produitsQ.data, cat, sousCat, typeObjet, matiere, stat, action, q, tri]);
 
   return (
     <div className="container-app py-6">
-      <header className="mb-4">
-        <h1 className="font-serif text-3xl text-primary">Stock</h1>
-        <p className="text-xs text-muted-foreground mt-1">
-          {filtered.length} / {produitsQ.data?.length ?? 0} produits
-        </p>
+      <header className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h1 className="font-serif text-3xl text-primary">Stock</h1>
+          <p className="text-xs text-muted-foreground mt-1">
+            {filtered.length} / {produitsQ.data?.length ?? 0} produits
+          </p>
+        </div>
+        <Link
+          to="/produit/nouveau"
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 py-2 text-sm shrink-0"
+        >
+          <Plus className="w-4 h-4" /> Nouveau produit
+        </Link>
       </header>
 
       <div className="space-y-2 mb-4">
@@ -115,7 +157,7 @@ function Stock() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q} onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher (marque, modèle, VV-…)"
+            placeholder="Rechercher (marque, modèle, catégorie, matière, VV-…)"
             className="w-full pl-9 pr-3 py-2.5 rounded-md border bg-card text-sm"
           />
         </div>
@@ -128,9 +170,33 @@ function Stock() {
           ))}
         </div>
         <div className="flex gap-2 overflow-x-auto">
-          <select value={cat} onChange={(e) => setCat(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
+          <select
+            value={cat}
+            onChange={(e) => { setCat(e.target.value); setSousCat(""); }}
+            className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0"
+          >
             <option value="">Toutes catégories</option>
-            {CATEGORIES.map((c) => <option key={c} value={c}>{CAT_LABEL[c]}</option>)}
+            {(categoriesQ.data ?? []).filter((c) => c.actif).map((c) => (
+              <option key={c.id} value={c.id}>{c.libelle}</option>
+            ))}
+          </select>
+          <select value={sousCat} onChange={(e) => setSousCat(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
+            <option value="">Toutes sous-catégories</option>
+            {sousCategoriesVisibles.filter((sc) => sc.actif).map((sc) => (
+              <option key={sc.id} value={sc.id}>{sc.libelle}</option>
+            ))}
+          </select>
+          <select value={typeObjet} onChange={(e) => setTypeObjet(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
+            <option value="">Tous types</option>
+            {(typesQ.data ?? []).filter((t) => t.actif).map((t) => (
+              <option key={t.id} value={t.id}>{t.libelle}</option>
+            ))}
+          </select>
+          <select value={matiere} onChange={(e) => setMatiere(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
+            <option value="">Toutes matières</option>
+            {(matieresQ.data ?? []).filter((m) => m.actif).map((m) => (
+              <option key={m.id} value={m.id}>{m.parent_id ? "— " : ""}{m.libelle}</option>
+            ))}
           </select>
           <select value={stat} onChange={(e) => setStat(e.target.value)} className="text-xs px-2 py-1.5 rounded-md border bg-card shrink-0">
             <option value="">Tous statuts</option>
@@ -156,6 +222,13 @@ function Stock() {
 
       {produitsQ.isLoading ? (
         <p className="text-muted-foreground">Chargement…</p>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-sm text-muted-foreground">Aucun produit ne correspond.</p>
+          <Link to="/produit/nouveau" className="mt-4 inline-flex items-center gap-1.5 rounded-md border bg-card px-3 py-2 text-sm">
+            <Plus className="w-4 h-4" /> Créer un produit
+          </Link>
+        </div>
       ) : view === "list" ? (
         <div className="space-y-2">{filtered.map((p) => <ProduitCard key={p.id} p={p} />)}</div>
       ) : (

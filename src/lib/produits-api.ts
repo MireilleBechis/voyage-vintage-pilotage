@@ -61,3 +61,35 @@ export async function deleteProduitRpc(id: string): Promise<void> {
   const { error } = await supabase.rpc("delete_produit_definitivement", { _id: id });
   if (error) throw error;
 }
+
+/** Remplace les rattachements référentiels d'un produit (listes complètes). */
+export async function setProduitRattachements(
+  id: string,
+  r: {
+    categories?: string[];
+    sousCategories?: string[];
+    types?: string[];
+    matieres?: Array<{ matiere_id: string; role: "principale" | "secondaire" }>;
+  },
+): Promise<void> {
+  const { error } = await supabase.rpc("set_produit_rattachements", {
+    _id: id,
+    _categories: (r.categories ?? null) as never,
+    _sous_categories: (r.sousCategories ?? null) as never,
+    _types: (r.types ?? null) as never,
+    _matieres: (r.matieres ?? null) as never,
+  });
+  if (error) throw error;
+}
+
+export async function prochainIdentifiantProduit(): Promise<string> {
+  const { data, error } = await supabase.rpc("prochain_identifiant_produit");
+  if (error) throw error;
+  return (data as string) ?? "VV-0001";
+}
+
+export async function prochainIdentifiantLot(): Promise<string> {
+  const { data, error } = await supabase.rpc("prochain_identifiant_lot");
+  if (error) throw error;
+  return (data as string) ?? "LOT-0001";
+}
