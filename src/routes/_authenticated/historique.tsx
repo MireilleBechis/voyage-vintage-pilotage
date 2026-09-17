@@ -10,7 +10,7 @@ import { Download, FileSpreadsheet } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/historique")({
   component: HistoriquePage,
   head: () => ({ meta: [
-    { title: "Historique — Voyage Vintage" },
+    { title: "Historique — La Dolce Vintage" },
     { name: "description", content: "Journal des actions sur les produits (archivage, corbeille, modifications)." },
   ] }),
 });

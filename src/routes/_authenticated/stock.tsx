@@ -22,7 +22,7 @@ import { LayoutGrid, List, Plus, Search } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/stock")({
   head: () => ({
     meta: [
-      { title: "Stock — Voyage Vintage" },
+      { title: "Stock — La Dolce Vintage" },
       { name: "description", content: "Liste complète du stock vintage avec filtres." },
     ],
   }),
@@ -157,7 +157,7 @@ function Stock() {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             value={q} onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher (marque, modèle, catégorie, matière, VV-…)"
+            placeholder="Rechercher (marque, modèle, catégorie, matière, DV-…)"
             className="w-full pl-9 pr-3 py-2.5 rounded-md border bg-card text-sm"
           />
         </div>

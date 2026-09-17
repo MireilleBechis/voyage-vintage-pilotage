@@ -27,7 +27,7 @@ export interface Tache {
 export const Route = createFileRoute("/_authenticated/taches")({
   head: () => ({
     meta: [
-      { title: "Tâches — Voyage Vintage" },
+      { title: "Tâches — La Dolce Vintage" },
       { name: "description", content: "Toutes les tâches à faire sur le stock vintage." },
     ],
   }),

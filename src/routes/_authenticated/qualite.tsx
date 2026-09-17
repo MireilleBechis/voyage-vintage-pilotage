@@ -8,7 +8,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/qualite")({
   head: () => ({
     meta: [
-      { title: "Qualité des données — Voyage Vintage" },
+      { title: "Qualité des données — La Dolce Vintage" },
       { name: "description", content: "Anomalies, prix absents et doublons possibles à revoir." },
     ],
   }),

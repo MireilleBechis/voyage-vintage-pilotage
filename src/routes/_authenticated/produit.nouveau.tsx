@@ -17,7 +17,7 @@ import {
 export const Route = createFileRoute("/_authenticated/produit/nouveau")({
   head: () => ({
     meta: [
-      { title: "Nouveau produit — Voyage Vintage" },
+      { title: "Nouveau produit — La Dolce Vintage" },
       { name: "description", content: "Créer une nouvelle fiche produit dans le stock vintage." },
     ],
   }),

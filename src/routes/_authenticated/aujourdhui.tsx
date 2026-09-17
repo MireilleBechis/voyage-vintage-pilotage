@@ -12,7 +12,7 @@ import { importInitialStock } from "@/lib/import.functions";
 export const Route = createFileRoute("/_authenticated/aujourdhui")({
   head: () => ({
     meta: [
-      { title: "Aujourd'hui — Voyage Vintage" },
+      { title: "Aujourd'hui — La Dolce Vintage" },
       { name: "description", content: "Priorités du jour pour piloter le stock vintage." },
     ],
   }),
@@ -66,7 +66,7 @@ function Aujourdhui() {
     return (
       <div className="container-app py-10">
         <header className="mb-8">
-          <p className="text-xs uppercase tracking-[0.3em] text-brass">Voyage Vintage</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-brass">La Dolce Vintage</p>
           <h1 className="font-serif text-4xl text-primary mt-2">Aujourd'hui</h1>
         </header>
         <div className="border rounded-xl bg-card p-6 text-center">

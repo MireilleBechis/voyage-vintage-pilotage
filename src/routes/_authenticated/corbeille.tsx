@@ -13,7 +13,7 @@ import { dateFr } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/corbeille")({
   head: () => ({
     meta: [
-      { title: "Corbeille — Voyage Vintage" },
+      { title: "Corbeille — La Dolce Vintage" },
       { name: "description", content: "Produits mis à la corbeille, restauration ou suppression définitive." },
     ],
   }),

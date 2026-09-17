@@ -27,7 +27,7 @@ import { exportHistoriqueCsv, exportHistoriqueXlsx } from "@/lib/export-historiq
 export const Route = createFileRoute("/_authenticated/produit/$id")({
   head: () => ({
     meta: [
-      { title: "Fiche produit — Voyage Vintage" },
+      { title: "Fiche produit — La Dolce Vintage" },
       { name: "description", content: "Détails d'un produit vintage du stock." },
     ],
   }),
@@ -96,7 +96,7 @@ function Fiche() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center container-app py-10">
         <div className="text-center max-w-sm">
-          <p className="text-xs uppercase tracking-[0.3em] text-brass">Voyage Vintage</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-brass">La Dolce Vintage</p>
           <h1 className="font-serif text-3xl text-primary mt-2">Produit introuvable</h1>
           <p className="text-sm text-muted-foreground mt-2">
             L'identifiant demandé n'existe pas ou vous n'y avez pas accès.

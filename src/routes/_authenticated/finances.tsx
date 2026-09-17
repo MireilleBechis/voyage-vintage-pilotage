@@ -25,7 +25,7 @@ import { differenceInDays, parseISO } from "date-fns";
 export const Route = createFileRoute("/_authenticated/finances")({
   head: () => ({
     meta: [
-      { title: "Tableau de bord — Voyage Vintage" },
+      { title: "Tableau de bord — La Dolce Vintage" },
       { name: "description", content: "KPI, répartition du stock par catégorie et statut, capital immobilisé et ancienneté." },
     ],
   }),

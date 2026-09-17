@@ -85,7 +85,7 @@ export async function setProduitRattachements(
 export async function prochainIdentifiantProduit(): Promise<string> {
   const { data, error } = await supabase.rpc("prochain_identifiant_produit");
   if (error) throw error;
-  return (data as string) ?? "VV-0001";
+  return (data as string) ?? "DV-0001";
 }
 
 export async function prochainIdentifiantLot(): Promise<string> {

@@ -14,7 +14,7 @@ const TABS: { key: Statut; label: string }[] = [
 export const Route = createFileRoute("/_authenticated/ventes")({
   head: () => ({
     meta: [
-      { title: "Ventes — Voyage Vintage" },
+      { title: "Ventes — La Dolce Vintage" },
       { name: "description", content: "Objets en ligne, réservés et vendus." },
     ],
   }),
