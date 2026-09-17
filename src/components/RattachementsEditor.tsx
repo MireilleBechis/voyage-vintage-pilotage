@@ -46,7 +46,7 @@ function MatiereSelect({
 }) {
   const racines = matieres.filter((m) => !m.parent_id && m.actif);
   const racine = racineDe(value, matieres);
-  const enfants = matieres.filter((m) => m.parent_id === racine && m.actif);
+  const enfants = racine ? matieres.filter((m) => m.parent_id === racine && m.actif) : [];
   const enfantChoisi = value && value !== racine ? value : "";
 
   return (
