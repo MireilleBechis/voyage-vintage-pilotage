@@ -7,8 +7,8 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Connexion — Voyage Vintage" },
-      { name: "description", content: "Accès privé au pilotage du stock Voyage Vintage." },
+      { title: "Connexion — La Dolce Vintage" },
+      { name: "description", content: "Accès privé au pilotage du stock La Dolce Vintage." },
     ],
   }),
   component: AuthPage,
@@ -49,7 +49,7 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col justify-center container-app py-12">
       <div className="text-center mb-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-brass">Voyage Vintage</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-brass">La Dolce Vintage</p>
         <h1 className="font-serif text-4xl text-primary mt-2">Pilotage du stock</h1>
         <p className="text-sm text-muted-foreground mt-2 italic">Accès privé.</p>
       </div>

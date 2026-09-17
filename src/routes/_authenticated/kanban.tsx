@@ -7,7 +7,7 @@ import { eur } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/kanban")({
   head: () => ({
     meta: [
-      { title: "Kanban — Voyage Vintage" },
+      { title: "Kanban — La Dolce Vintage" },
       { name: "description", content: "Produits classés par statut dans le pipeline de vente." },
     ],
   }),

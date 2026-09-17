@@ -9,7 +9,7 @@ import { eur } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/debloquer")({
   head: () => ({
     meta: [
-      { title: "À débloquer — Voyage Vintage" },
+      { title: "À débloquer — La Dolce Vintage" },
       { name: "description", content: "Produits qui attendent une action pour être vendus." },
     ],
   }),

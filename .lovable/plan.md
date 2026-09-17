@@ -1,4 +1,4 @@
-# Audit lecture seule — Voyage Vintage
+# Audit lecture seule — La Dolce Vintage
 
 Aucune modification effectuée. Constats vérifiés par lecture des migrations, de la définition réelle des vues en base et du code front.
 

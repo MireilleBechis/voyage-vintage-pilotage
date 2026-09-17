@@ -531,7 +531,7 @@ BEGIN
      AND NOT EXISTS (SELECT 1 FROM public.produit_categories pc WHERE pc.produit_id = _id AND pc.categorie_id = produits.categorie_shopify_id);
 END; $$;
 
--- Prochain identifiant VV-xxxx --------------------------------------
+-- Prochain identifiant DV-xxxx --------------------------------------
 CREATE OR REPLACE FUNCTION public.prochain_identifiant_produit()
 RETURNS text LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path TO 'public','pg_temp' AS $$
 DECLARE n integer;
@@ -539,9 +539,9 @@ BEGIN
   IF auth.uid() IS NULL OR NOT public._is_interne(auth.uid()) THEN
     RAISE EXCEPTION 'Accès refusé' USING ERRCODE='42501';
   END IF;
-  SELECT COALESCE(max(NULLIF(regexp_replace(identifiant, '^VV-', ''), '')::integer), 0) + 1
-    INTO n FROM public.produits WHERE identifiant ~ '^VV-[0-9]+$';
-  RETURN 'VV-' || lpad(n::text, 4, '0');
+  SELECT COALESCE(max(NULLIF(regexp_replace(identifiant, '^DV-', ''), '')::integer), 0) + 1
+    INTO n FROM public.produits WHERE identifiant ~ '^DV-[0-9]+$';
+  RETURN 'DV-' || lpad(n::text, 4, '0');
 END; $$;
 
 CREATE OR REPLACE FUNCTION public.prochain_identifiant_lot()

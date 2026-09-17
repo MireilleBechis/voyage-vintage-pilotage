@@ -21,7 +21,7 @@ import { eur } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/lots")({
   head: () => ({
     meta: [
-      { title: "Lots — Voyage Vintage" },
+      { title: "Lots — La Dolce Vintage" },
       { name: "description", content: "Regrouper des produits vintage en lots vendables." },
     ],
   }),
@@ -202,7 +202,7 @@ function LotCard({ lot, ouvert, onToggle }: { lot: Lot; ouvert: boolean; onToggl
 
           <div>
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">Ajouter un produit</p>
-            <input value={rech} onChange={(e) => setRech(e.target.value)} placeholder="Rechercher (VV-…, marque, modèle)"
+            <input value={rech} onChange={(e) => setRech(e.target.value)} placeholder="Rechercher (DV-…, marque, modèle)"
               className="w-full rounded-md border bg-background px-2 py-2 text-sm" />
             {candidats.length > 0 && (
               <div className="mt-1.5 space-y-1">
