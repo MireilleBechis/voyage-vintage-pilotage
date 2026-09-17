@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Home, Package, Kanban, Coins, MoreHorizontal } from "lucide-react";
+import { Home, Package, Kanban, Coins, MoreHorizontal, Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ const NAV = [
 ] as const;
 
 const MORE: ReadonlyArray<{ to: string; label: string; adminOnly?: boolean }> = [
+  { to: "/lots", label: "Lots" },
   { to: "/taches", label: "Tâches" },
   { to: "/debloquer", label: "À débloquer" },
   { to: "/ventes", label: "Ventes" },
@@ -67,6 +68,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
+
+      <Link
+        to="/produit/nouveau"
+        aria-label="Nouveau produit"
+        className="fixed bottom-20 right-4 z-30 inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground shadow-lg px-4 py-3 text-sm"
+      >
+        <Plus className="w-4 h-4" /> Nouveau
+      </Link>
 
       <nav className="fixed bottom-0 inset-x-0 z-30 border-t bg-card/95 backdrop-blur">
         <div className="mx-auto max-w-md grid grid-cols-5">
