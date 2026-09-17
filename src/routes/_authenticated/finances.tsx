@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listProduitsInterne } from "@/lib/produits-api";
-import { CAT_LABEL, margeReelle, STATUT_LABEL, type Produit, type Statut } from "@/lib/produits";
+import { margeReelle, STATUT_LABEL, type Produit, type Statut } from "@/lib/produits";
 
 // Couleurs pleines pour les barres du tableau de bord : les tokens de badge
 // (fonds à 15 % d'opacité) sont quasi invisibles sur une barre fine.
@@ -65,7 +65,7 @@ function Finances() {
 
   const montant = (v: number, masque: boolean) => (masque ? "—" : eur(v));
 
-  const parCat = groupBy(enStock, (p) => p.categorie);
+  const parCat = groupBy(enStock, (p) => p.categories_libelles?.[0] ?? "Sans catégorie");
   const parStatut = groupBy(enStock, (p) => p.statut);
 
   // Ancienneté en stock (jours depuis date_achat, fallback created_at)
@@ -129,7 +129,7 @@ function Finances() {
         <BarList
           items={Object.entries(parCat).map(([cat, items]) => ({
             key: cat,
-            label: CAT_LABEL[cat as keyof typeof CAT_LABEL] ?? cat,
+            label: cat,
             count: items.length,
             value: sum(items.map((p) => p.cout_total)),
             colorClass: "bg-primary/70 text-primary-foreground border-primary/40",

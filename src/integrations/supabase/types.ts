@@ -50,6 +50,77 @@ export type Database = {
         }
         Relationships: []
       }
+      categorie_champs: {
+        Row: {
+          categorie_id: string
+          champ: string
+          created_at: string
+          id: string
+          libelle: string
+          obligatoire: boolean
+          ordre: number
+          updated_at: string
+        }
+        Insert: {
+          categorie_id: string
+          champ: string
+          created_at?: string
+          id?: string
+          libelle: string
+          obligatoire?: boolean
+          ordre?: number
+          updated_at?: string
+        }
+        Update: {
+          categorie_id?: string
+          champ?: string
+          created_at?: string
+          id?: string
+          libelle?: string
+          obligatoire?: boolean
+          ordre?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categorie_champs_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          actif: boolean
+          created_at: string
+          id: string
+          libelle: string
+          ordre: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle: string
+          ordre?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle?: string
+          ordre?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           accepte_par: string | null
@@ -95,6 +166,187 @@ export type Database = {
         }
         Relationships: []
       }
+      lot_produits: {
+        Row: {
+          created_at: string
+          lot_id: string
+          produit_id: string
+        }
+        Insert: {
+          created_at?: string
+          lot_id: string
+          produit_id: string
+        }
+        Update: {
+          created_at?: string
+          lot_id?: string
+          produit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_produits_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_produits_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "lots_detail"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_produits_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_produits_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lot_produits_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lots: {
+        Row: {
+          archived_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          identifiant: string
+          libelle: string
+          notes: string | null
+          owner_id: string
+          prix_lot_negocie: number | null
+          trashed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          identifiant: string
+          libelle: string
+          notes?: string | null
+          owner_id: string
+          prix_lot_negocie?: number | null
+          trashed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          identifiant?: string
+          libelle?: string
+          notes?: string | null
+          owner_id?: string
+          prix_lot_negocie?: number | null
+          trashed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      matieres: {
+        Row: {
+          actif: boolean
+          created_at: string
+          id: string
+          libelle: string
+          ordre: number
+          parent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle: string
+          ordre?: number
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle?: string
+          ordre?: number
+          parent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matieres_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "matieres"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produit_categories: {
+        Row: {
+          categorie_id: string
+          created_at: string
+          produit_id: string
+        }
+        Insert: {
+          categorie_id: string
+          created_at?: string
+          produit_id: string
+        }
+        Update: {
+          categorie_id?: string
+          created_at?: string
+          produit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produit_categories_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produit_historique: {
         Row: {
           acteur_email: string | null
@@ -131,6 +383,150 @@ export type Database = {
         }
         Relationships: []
       }
+      produit_matieres: {
+        Row: {
+          created_at: string
+          matiere_id: string
+          produit_id: string
+          role: Database["public"]["Enums"]["matiere_role"]
+        }
+        Insert: {
+          created_at?: string
+          matiere_id: string
+          produit_id: string
+          role?: Database["public"]["Enums"]["matiere_role"]
+        }
+        Update: {
+          created_at?: string
+          matiere_id?: string
+          produit_id?: string
+          role?: Database["public"]["Enums"]["matiere_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produit_matieres_matiere_id_fkey"
+            columns: ["matiere_id"]
+            isOneToOne: false
+            referencedRelation: "matieres"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_matieres_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_matieres_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_matieres_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produit_sous_categories: {
+        Row: {
+          created_at: string
+          produit_id: string
+          sous_categorie_id: string
+        }
+        Insert: {
+          created_at?: string
+          produit_id: string
+          sous_categorie_id: string
+        }
+        Update: {
+          created_at?: string
+          produit_id?: string
+          sous_categorie_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produit_sous_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_sous_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_sous_categories_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_sous_categories_sous_categorie_id_fkey"
+            columns: ["sous_categorie_id"]
+            isOneToOne: false
+            referencedRelation: "sous_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produit_types: {
+        Row: {
+          created_at: string
+          produit_id: string
+          type_objet_id: string
+        }
+        Insert: {
+          created_at?: string
+          produit_id: string
+          type_objet_id: string
+        }
+        Update: {
+          created_at?: string
+          produit_id?: string
+          type_objet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produit_types_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_types_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_interne"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_types_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "produit_types_type_objet_id_fkey"
+            columns: ["type_objet_id"]
+            isOneToOne: false
+            referencedRelation: "types_objet"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produits: {
         Row: {
           actions_requises: string[]
@@ -141,7 +537,7 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"]
+          categorie_shopify_id: string | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -170,7 +566,6 @@ export type Database = {
           import_original: Json | null
           liens_annonces: Json
           marge_potentielle: number | null
-          materiaux: string | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort: number | null
@@ -196,7 +591,6 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
           statut: Database["public"]["Enums"]["statut_produit"]
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean
@@ -207,7 +601,6 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"]
           tva_taux: number
-          type_objet: string | null
           updated_at: string
           validation_statut: Database["public"]["Enums"]["validation_statut"]
           visibilite: Database["public"]["Enums"]["produit_visibilite"]
@@ -222,7 +615,7 @@ export type Database = {
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"]
+          categorie_shopify_id?: string | null
           coque_assise?: string | null
           couleur?: string | null
           cout_total?: number | null
@@ -251,7 +644,6 @@ export type Database = {
           import_original?: Json | null
           liens_annonces?: Json
           marge_potentielle?: number | null
-          materiaux?: string | null
           modele?: string | null
           nettoyage?: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort?: number | null
@@ -277,7 +669,6 @@ export type Database = {
           shopify_product_id?: string | null
           source_feuille?: string | null
           source_ligne?: number | null
-          sous_categorie?: string | null
           statut?: Database["public"]["Enums"]["statut_produit"]
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean
@@ -288,7 +679,6 @@ export type Database = {
           trashed_by?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"]
           tva_taux?: number
-          type_objet?: string | null
           updated_at?: string
           validation_statut?: Database["public"]["Enums"]["validation_statut"]
           visibilite?: Database["public"]["Enums"]["produit_visibilite"]
@@ -303,7 +693,7 @@ export type Database = {
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
-          categorie?: Database["public"]["Enums"]["categorie_produit"]
+          categorie_shopify_id?: string | null
           coque_assise?: string | null
           couleur?: string | null
           cout_total?: number | null
@@ -332,7 +722,6 @@ export type Database = {
           import_original?: Json | null
           liens_annonces?: Json
           marge_potentielle?: number | null
-          materiaux?: string | null
           modele?: string | null
           nettoyage?: Database["public"]["Enums"]["etat_nettoyage"]
           niveau_effort?: number | null
@@ -358,7 +747,6 @@ export type Database = {
           shopify_product_id?: string | null
           source_feuille?: string | null
           source_ligne?: number | null
-          sous_categorie?: string | null
           statut?: Database["public"]["Enums"]["statut_produit"]
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean
@@ -369,13 +757,20 @@ export type Database = {
           trashed_by?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"]
           tva_taux?: number
-          type_objet?: string | null
           updated_at?: string
           validation_statut?: Database["public"]["Enums"]["validation_statut"]
           visibilite?: Database["public"]["Enums"]["produit_visibilite"]
           woodcase?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "produits_categorie_shopify_id_fkey"
+            columns: ["categorie_shopify_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -397,6 +792,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      sous_categories: {
+        Row: {
+          actif: boolean
+          categorie_id: string
+          created_at: string
+          id: string
+          libelle: string
+          ordre: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          actif?: boolean
+          categorie_id: string
+          created_at?: string
+          id?: string
+          libelle: string
+          ordre?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          actif?: boolean
+          categorie_id?: string
+          created_at?: string
+          id?: string
+          libelle?: string
+          ordre?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sous_categories_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       taches: {
         Row: {
@@ -470,6 +906,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      types_objet: {
+        Row: {
+          actif: boolean
+          created_at: string
+          id: string
+          libelle: string
+          ordre: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle: string
+          ordre?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          id?: string
+          libelle?: string
+          ordre?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_permissions: {
         Row: {
@@ -545,6 +1011,57 @@ export type Database = {
       }
     }
     Views: {
+      lots_detail: {
+        Row: {
+          archived_at: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          identifiant: string | null
+          libelle: string | null
+          nb_produits: number | null
+          notes: string | null
+          owner_id: string | null
+          prix_calcule: number | null
+          prix_lot_negocie: number | null
+          statut_calcule: string | null
+          trashed_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          identifiant?: string | null
+          libelle?: string | null
+          nb_produits?: never
+          notes?: string | null
+          owner_id?: string | null
+          prix_calcule?: never
+          prix_lot_negocie?: number | null
+          statut_calcule?: never
+          trashed_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          identifiant?: string | null
+          libelle?: string | null
+          nb_produits?: never
+          notes?: string | null
+          owner_id?: string | null
+          prix_calcule?: never
+          prix_lot_negocie?: number | null
+          statut_calcule?: never
+          trashed_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       produits_interne: {
         Row: {
           actions_requises: string[] | null
@@ -555,7 +1072,9 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids: string[] | null
+          categorie_shopify_id: string | null
+          categories_libelles: string[] | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -585,8 +1104,11 @@ export type Database = {
           impedance: string | null
           import_original: Json | null
           liens_annonces: Json | null
+          lot_id: string | null
+          lot_identifiant: string | null
+          lot_libelle: string | null
           marge_potentielle: number | null
-          materiaux: string | null
+          matieres: Json | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort: number | null
@@ -612,7 +1134,8 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
+          sous_categorie_ids: string[] | null
+          sous_categories_libelles: string[] | null
           statut: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean | null
@@ -623,7 +1146,8 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
-          type_objet: string | null
+          type_objet_ids: string[] | null
+          types_libelles: string[] | null
           updated_at: string | null
           validation_statut:
             | Database["public"]["Enums"]["validation_statut"]
@@ -640,7 +1164,9 @@ export type Database = {
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
-          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids?: never
+          categorie_shopify_id?: string | null
+          categories_libelles?: never
           coque_assise?: string | null
           couleur?: string | null
           cout_total?: never
@@ -670,8 +1196,11 @@ export type Database = {
           impedance?: string | null
           import_original?: Json | null
           liens_annonces?: Json | null
+          lot_id?: never
+          lot_identifiant?: never
+          lot_libelle?: never
           marge_potentielle?: never
-          materiaux?: string | null
+          matieres?: never
           modele?: string | null
           nettoyage?: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort?: number | null
@@ -697,7 +1226,8 @@ export type Database = {
           shopify_product_id?: string | null
           source_feuille?: string | null
           source_ligne?: number | null
-          sous_categorie?: string | null
+          sous_categorie_ids?: never
+          sous_categories_libelles?: never
           statut?: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean | null
@@ -708,7 +1238,8 @@ export type Database = {
           trashed_by?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux?: number | null
-          type_objet?: string | null
+          type_objet_ids?: never
+          types_libelles?: never
           updated_at?: string | null
           validation_statut?:
             | Database["public"]["Enums"]["validation_statut"]
@@ -725,7 +1256,9 @@ export type Database = {
           blocage?: string | null
           cabinet?: string | null
           canal_achat?: string | null
-          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids?: never
+          categorie_shopify_id?: string | null
+          categories_libelles?: never
           coque_assise?: string | null
           couleur?: string | null
           cout_total?: never
@@ -755,8 +1288,11 @@ export type Database = {
           impedance?: string | null
           import_original?: Json | null
           liens_annonces?: Json | null
+          lot_id?: never
+          lot_identifiant?: never
+          lot_libelle?: never
           marge_potentielle?: never
-          materiaux?: string | null
+          matieres?: never
           modele?: string | null
           nettoyage?: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort?: number | null
@@ -782,7 +1318,8 @@ export type Database = {
           shopify_product_id?: string | null
           source_feuille?: string | null
           source_ligne?: number | null
-          sous_categorie?: string | null
+          sous_categorie_ids?: never
+          sous_categories_libelles?: never
           statut?: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le?: string | null
           statut_modifie_manuellement?: boolean | null
@@ -793,7 +1330,8 @@ export type Database = {
           trashed_by?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux?: number | null
-          type_objet?: string | null
+          type_objet_ids?: never
+          types_libelles?: never
           updated_at?: string | null
           validation_statut?:
             | Database["public"]["Enums"]["validation_statut"]
@@ -801,12 +1339,20 @@ export type Database = {
           visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
           woodcase?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "produits_categorie_shopify_id_fkey"
+            columns: ["categorie_shopify_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       produits_public: {
         Row: {
           annee: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categories_libelles: string[] | null
           couleur: string | null
           created_at: string | null
           description: string | null
@@ -819,21 +1365,22 @@ export type Database = {
           etat: string | null
           id: string | null
           identifiant: string | null
-          materiaux: string | null
+          matieres_libelles: string[] | null
           modele: string | null
           photos: Json | null
           prix_pro_ht: number | null
           prix_public_ttc: number | null
-          sous_categorie: string | null
+          sous_categories_libelles: string[] | null
           titre_commercial: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
+          types_libelles: string[] | null
           updated_at: string | null
           visibilite: Database["public"]["Enums"]["produit_visibilite"] | null
         }
         Insert: {
           annee?: string | null
-          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          categories_libelles?: never
           couleur?: string | null
           created_at?: string | null
           description?: string | null
@@ -846,21 +1393,22 @@ export type Database = {
           etat?: string | null
           id?: string | null
           identifiant?: string | null
-          materiaux?: string | null
+          matieres_libelles?: never
           modele?: string | null
           photos?: Json | null
           prix_pro_ht?: never
           prix_public_ttc?: number | null
-          sous_categorie?: string | null
+          sous_categories_libelles?: never
           titre_commercial?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux?: number | null
+          types_libelles?: never
           updated_at?: string | null
           visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
         }
         Update: {
           annee?: string | null
-          categorie?: Database["public"]["Enums"]["categorie_produit"] | null
+          categories_libelles?: never
           couleur?: string | null
           created_at?: string | null
           description?: string | null
@@ -873,15 +1421,16 @@ export type Database = {
           etat?: string | null
           id?: string | null
           identifiant?: string | null
-          materiaux?: string | null
+          matieres_libelles?: never
           modele?: string | null
           photos?: Json | null
           prix_pro_ht?: never
           prix_public_ttc?: number | null
-          sous_categorie?: string | null
+          sous_categories_libelles?: never
           titre_commercial?: string | null
           tva_regime?: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux?: number | null
+          types_libelles?: never
           updated_at?: string | null
           visibilite?: Database["public"]["Enums"]["produit_visibilite"] | null
         }
@@ -890,6 +1439,7 @@ export type Database = {
     }
     Functions: {
       _can_archive: { Args: { _uid: string }; Returns: boolean }
+      _can_modifier_produit: { Args: { _uid: string }; Returns: boolean }
       _check_finance_field_write: {
         Args: { _field: string; _uid: string }
         Returns: undefined
@@ -924,7 +1474,9 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids: string[] | null
+          categorie_shopify_id: string | null
+          categories_libelles: string[] | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -954,8 +1506,11 @@ export type Database = {
           impedance: string | null
           import_original: Json | null
           liens_annonces: Json | null
+          lot_id: string | null
+          lot_identifiant: string | null
+          lot_libelle: string | null
           marge_potentielle: number | null
-          materiaux: string | null
+          matieres: Json | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort: number | null
@@ -981,7 +1536,8 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
+          sous_categorie_ids: string[] | null
+          sous_categories_libelles: string[] | null
           statut: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean | null
@@ -992,7 +1548,8 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
-          type_objet: string | null
+          type_objet_ids: string[] | null
+          types_libelles: string[] | null
           updated_at: string | null
           validation_statut:
             | Database["public"]["Enums"]["validation_statut"]
@@ -1022,7 +1579,9 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids: string[] | null
+          categorie_shopify_id: string | null
+          categories_libelles: string[] | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -1052,8 +1611,11 @@ export type Database = {
           impedance: string | null
           import_original: Json | null
           liens_annonces: Json | null
+          lot_id: string | null
+          lot_identifiant: string | null
+          lot_libelle: string | null
           marge_potentielle: number | null
-          materiaux: string | null
+          matieres: Json | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort: number | null
@@ -1079,7 +1641,8 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
+          sous_categorie_ids: string[] | null
+          sous_categories_libelles: string[] | null
           statut: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean | null
@@ -1090,7 +1653,8 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
-          type_objet: string | null
+          type_objet_ids: string[] | null
+          types_libelles: string[] | null
           updated_at: string | null
           validation_statut:
             | Database["public"]["Enums"]["validation_statut"]
@@ -1134,7 +1698,9 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids: string[] | null
+          categorie_shopify_id: string | null
+          categories_libelles: string[] | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -1164,8 +1730,11 @@ export type Database = {
           impedance: string | null
           import_original: Json | null
           liens_annonces: Json | null
+          lot_id: string | null
+          lot_identifiant: string | null
+          lot_libelle: string | null
           marge_potentielle: number | null
-          materiaux: string | null
+          matieres: Json | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort: number | null
@@ -1191,7 +1760,8 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
+          sous_categorie_ids: string[] | null
+          sous_categories_libelles: string[] | null
           statut: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean | null
@@ -1202,7 +1772,8 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
-          type_objet: string | null
+          type_objet_ids: string[] | null
+          types_libelles: string[] | null
           updated_at: string | null
           validation_statut:
             | Database["public"]["Enums"]["validation_statut"]
@@ -1221,11 +1792,23 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["produits"]["Row"] }
         Returns: number
       }
+      prochain_identifiant_lot: { Args: never; Returns: string }
+      prochain_identifiant_produit: { Args: never; Returns: string }
       restore_produit_from_archive: {
         Args: { _id: string }
         Returns: undefined
       }
       restore_produit_from_trash: { Args: { _id: string }; Returns: undefined }
+      set_produit_rattachements: {
+        Args: {
+          _categories: string[]
+          _id: string
+          _matieres: Json
+          _sous_categories: string[]
+          _types: string[]
+        }
+        Returns: undefined
+      }
       trash_produit: { Args: { _id: string }; Returns: undefined }
       update_produit: {
         Args: { _data: Json; _id: string }
@@ -1238,7 +1821,9 @@ export type Database = {
           blocage: string | null
           cabinet: string | null
           canal_achat: string | null
-          categorie: Database["public"]["Enums"]["categorie_produit"] | null
+          categorie_ids: string[] | null
+          categorie_shopify_id: string | null
+          categories_libelles: string[] | null
           coque_assise: string | null
           couleur: string | null
           cout_total: number | null
@@ -1268,8 +1853,11 @@ export type Database = {
           impedance: string | null
           import_original: Json | null
           liens_annonces: Json | null
+          lot_id: string | null
+          lot_identifiant: string | null
+          lot_libelle: string | null
           marge_potentielle: number | null
-          materiaux: string | null
+          matieres: Json | null
           modele: string | null
           nettoyage: Database["public"]["Enums"]["etat_nettoyage"] | null
           niveau_effort: number | null
@@ -1295,7 +1883,8 @@ export type Database = {
           shopify_product_id: string | null
           source_feuille: string | null
           source_ligne: number | null
-          sous_categorie: string | null
+          sous_categorie_ids: string[] | null
+          sous_categories_libelles: string[] | null
           statut: Database["public"]["Enums"]["statut_produit"] | null
           statut_calcule_le: string | null
           statut_modifie_manuellement: boolean | null
@@ -1306,7 +1895,8 @@ export type Database = {
           trashed_by: string | null
           tva_regime: Database["public"]["Enums"]["tva_regime"] | null
           tva_taux: number | null
-          type_objet: string | null
+          type_objet_ids: string[] | null
+          types_libelles: string[] | null
           updated_at: string | null
           validation_statut:
             | Database["public"]["Enums"]["validation_statut"]
@@ -1337,15 +1927,6 @@ export type Database = {
         | "collaborateur"
         | "invite_particulier"
         | "invite_pro"
-      categorie_produit:
-        | "enceintes"
-        | "chaises"
-        | "fauteuils"
-        | "tables"
-        | "meubles"
-        | "canapes"
-        | "luminaires"
-        | "autre"
       etat_nettoyage: "a_verifier" | "necessaire" | "non_necessaire" | "termine"
       etat_restauration:
         | "a_verifier"
@@ -1353,6 +1934,7 @@ export type Database = {
         | "non_necessaire"
         | "terminee"
       invitation_statut: "en_attente" | "acceptee" | "expiree" | "revoquee"
+      matiere_role: "principale" | "secondaire"
       motif_archivage:
         | "vendu_anterieurement"
         | "retire_vente"
@@ -1560,16 +2142,6 @@ export const Constants = {
         "invite_particulier",
         "invite_pro",
       ],
-      categorie_produit: [
-        "enceintes",
-        "chaises",
-        "fauteuils",
-        "tables",
-        "meubles",
-        "canapes",
-        "luminaires",
-        "autre",
-      ],
       etat_nettoyage: ["a_verifier", "necessaire", "non_necessaire", "termine"],
       etat_restauration: [
         "a_verifier",
@@ -1578,6 +2150,7 @@ export const Constants = {
         "terminee",
       ],
       invitation_statut: ["en_attente", "acceptee", "expiree", "revoquee"],
+      matiere_role: ["principale", "secondaire"],
       motif_archivage: [
         "vendu_anterieurement",
         "retire_vente",

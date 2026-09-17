@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import {
-  CAT_LABEL,
   STATUT_LABEL,
   STATUT_COULEUR,
   ACTION_REQUISE_LABEL,
@@ -30,7 +29,7 @@ export function ProduitCard({ p }: { p: Produit }) {
             <img src={photo} alt={p.designer_ou_marque ?? ""} className="w-full h-full object-cover" />
           ) : (
             <span className="text-[10px] text-muted-foreground text-center px-1">
-              {CAT_LABEL[p.categorie]}
+              {p.categories_libelles?.[0] ?? "Sans catégorie"}
             </span>
           )}
           {p.photos && p.photos.length > 1 && (
@@ -47,7 +46,7 @@ export function ProduitCard({ p }: { p: Produit }) {
                 {p.designer_ou_marque ?? "—"}
               </h3>
               <p className="text-xs text-muted-foreground truncate">
-                {p.modele ?? p.type_objet ?? CAT_LABEL[p.categorie]}
+                {p.modele ?? p.types_libelles?.[0] ?? p.categories_libelles?.[0] ?? "—"}
               </p>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
