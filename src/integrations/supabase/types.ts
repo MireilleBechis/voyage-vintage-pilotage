@@ -1028,38 +1028,6 @@ export type Database = {
           trashed_at: string | null
           updated_at: string | null
         }
-        Insert: {
-          archived_at?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          identifiant?: string | null
-          libelle?: string | null
-          nb_produits?: never
-          notes?: string | null
-          owner_id?: string | null
-          prix_calcule?: never
-          prix_lot_negocie?: number | null
-          statut_calcule?: never
-          trashed_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          archived_at?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          identifiant?: string | null
-          libelle?: string | null
-          nb_produits?: never
-          notes?: string | null
-          owner_id?: string | null
-          prix_calcule?: never
-          prix_lot_negocie?: number | null
-          statut_calcule?: never
-          trashed_at?: string | null
-          updated_at?: string | null
-        }
         Relationships: []
       }
       produits_interne: {
